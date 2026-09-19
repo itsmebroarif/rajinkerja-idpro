@@ -1158,7 +1158,7 @@ export default {
         title: 'SISTEM & PANDUAN',
         icon: 'bi-gear-wide-connected',
         items: [
-          { to: '/login', label: 'Login & Gerbang Host', icon: 'bi-box-arrow-in-right', color: '#f59e0b', badgeText: 'Host Gate', badgeClass: 'bg-warning text-dark' },
+          { to: '/login', label: 'Masuk Akun Tim', icon: 'bi-box-arrow-in-right', color: '#2563eb' },
           { to: '/auth', label: 'Akun, Role & Cloud', icon: 'bi-shield-lock-fill', color: '#4f46e5', badgeText: 'Firebase', badgeClass: 'bg-primary-subtle text-primary border border-primary-subtle' },
           { to: '/drive-vault', label: 'Google Drive Vault', icon: 'bi-google', color: '#10b981', badgeText: 'Drive API', badgeClass: 'bg-success-subtle text-success border border-success-subtle' },
           { to: '/storage', label: 'Storage & Kuota', icon: 'bi-hdd-stack-fill', color: '#0284c7', badge: () => isStorageFullState.value ? 'Penuh!' : null, badgeClass: 'bg-danger text-white' },
