@@ -6,11 +6,19 @@
     <!-- Dukung Dev Modal Popup (Bank & E-Wallet) -->
     <DukungDevModal v-model="showDukungModal" />
 
+    <!-- Konfirmasi Logout Modal Dialog (Aesthetic & Interactive) -->
+    <LogoutConfirmModal 
+      v-model="showLogoutModal" 
+      :current-user="currentUser" 
+      :user-role="userRole" 
+      @confirm="confirmLogout" 
+    />
+
     <!-- =========================================================
          SAMSUNG DeX / WINDOWS DESKTOP OS MODE
          Persis mirip Samsung DeX dengan icon placement vertikal & taskbar
          ========================================================= -->
-    <template v-if="isDesktopMode">
+    <template v-if="isDesktopMode && showNavigation">
       <DesktopDexWorkspace @exit-desktop-mode="disableDesktopMode">
         <div class="p-3 p-md-4 main-view-viewport">
           <router-view v-slot="{ Component }">
@@ -26,11 +34,11 @@
          STANDARD APP MODE (Material 3 Sidebar Navigation & Top Bar)
          ========================================================= -->
     <template v-else>
-      <!-- Desktop Material Navigation Drawer -->
-      <aside :class="['sidebar-nav', { collapsed: isCollapsed, 'is-resizing': isResizingSidebar }]">
+      <!-- Desktop Material Navigation Drawer: Hanya tampil jika sudah login -->
+      <aside v-if="showNavigation" :class="['sidebar-nav', { collapsed: isCollapsed, 'is-resizing': isResizingSidebar }]">
         <!-- Sidebar Brand Header -->
         <div class="sidebar-brand p-3 d-flex align-items-center justify-content-between">
-          <router-link to="/" class="text-decoration-none d-flex align-items-center gap-2.5 overflow-hidden" v-if="!isCollapsed">
+          <router-link :to="currentUser ? '/home' : '/login'" class="text-decoration-none d-flex align-items-center gap-2.5 overflow-hidden" v-if="!isCollapsed">
             <div class="brand-icon-wrapper shadow-sm">
               <img src="/logo.svg" alt="TaskArts Logo" class="brand-logo-img" />
             </div>
@@ -47,7 +55,7 @@
           </router-link>
 
           <div v-else class="mx-auto">
-            <router-link to="/" class="brand-icon-wrapper shadow-sm" title="TaskArts By Kafeinarts">
+            <router-link :to="currentUser ? '/home' : '/login'" class="brand-icon-wrapper shadow-sm" title="TaskArts By Kafeinarts">
               <img src="/logo.svg" alt="TaskArts Logo" class="brand-logo-img" />
             </router-link>
           </div>
@@ -93,99 +101,113 @@
           </div>
 
           <div v-for="(group, gIdx) in filteredNavGroups" :key="group.title || gIdx" class="sidebar-group-block mb-1">
-            <!-- Section Header -->
-            <div v-if="!isCollapsed" class="sidebar-section-header d-flex align-items-center justify-content-between">
-              <span>{{ group.title }}</span>
+            <!-- Section Header (Accordion Category) -->
+            <div 
+              v-if="!isCollapsed" 
+              class="sidebar-section-header d-flex align-items-center justify-content-between cursor-pointer user-select-none"
+              @click="toggleNavGroup(group.title)"
+              :title="`Klik untuk toggle kategori ${group.title}`"
+            >
+              <div class="d-flex align-items-center gap-1.5">
+                <span>{{ group.title }}</span>
+                <i 
+                  class="bi bi-chevron-down ms-1 text-muted transition-transform" 
+                  :class="{ 'rotate-180': !isNavGroupOpen(group.title) }" 
+                  style="font-size: 9px;"
+                ></i>
+              </div>
               <span class="badge rounded-pill bg-light text-muted border px-1.5 py-0.5" style="font-size: 9px;">{{ group.items.length }}</span>
             </div>
             <div v-else-if="gIdx > 0" class="sidebar-divider my-1.5"></div>
 
-            <!-- Items in Group -->
-            <template v-for="item in group.items" :key="item.id || item.to">
-              <!-- Dropdown / Submenu Parent Item -->
-              <div v-if="item.children && item.children.length > 0" class="sidebar-dropdown-wrapper mb-1">
-                <div
-                  class="material-nav-link sidebar-dropdown-toggle cursor-pointer"
-                  :class="{
-                    'dropdown-open': isDropdownOpen(item),
-                    'active-parent': isParentActive(item)
-                  }"
-                  @click="toggleDropdown(item)"
+            <!-- Items in Group (Collapsible via Accordion) -->
+            <div v-show="isCollapsed || isNavGroupOpen(group.title)">
+              <template v-for="item in group.items" :key="item.id || item.to">
+                <!-- Dropdown / Submenu Parent Item -->
+                <div v-if="item.children && item.children.length > 0" class="sidebar-dropdown-wrapper mb-1">
+                  <div
+                    class="material-nav-link sidebar-dropdown-toggle cursor-pointer"
+                    :class="{
+                      'dropdown-open': isDropdownOpen(item),
+                      'active-parent': isParentActive(item)
+                    }"
+                    @click="toggleDropdown(item)"
+                    :title="item.label"
+                  >
+                    <div class="nav-icon-box" :style="{ '--item-color': item.color }">
+                      <i :class="item.icon" class="nav-icon"></i>
+                    </div>
+                    <span v-if="!isCollapsed" class="nav-label text-truncate flex-grow-1" :title="item.label">{{ item.label }}</span>
+
+                    <!-- Module Count Badge -->
+                    <span v-if="!isCollapsed && item.badgeText" class="badge rounded-pill ms-auto ms-1 small text-nowrap" :class="item.badgeClass || 'bg-light text-dark border'">
+                      {{ item.badgeText }}
+                    </span>
+
+                    <!-- Submenu Accordion Chevron Indicator -->
+                    <i 
+                      v-if="!isCollapsed" 
+                      class="bi bi-chevron-down ms-1.5 fs-7 transition-transform" 
+                      :class="{ 'rotate-180': isDropdownOpen(item) }"
+                    ></i>
+                  </div>
+
+                  <!-- Collapsible Submenu Items -->
+                  <transition name="submenu-slide">
+                    <div v-if="!isCollapsed && isDropdownOpen(item)" class="sidebar-submenu ps-2 pe-1 pt-1 pb-1">
+                      <router-link
+                        v-for="sub in item.children"
+                        :key="sub.to"
+                        :to="sub.to"
+                        class="material-nav-link submenu-nav-link"
+                        :title="sub.label"
+                      >
+                        <div class="submenu-icon-box me-2" :style="{ '--sub-color': sub.color }">
+                          <i :class="sub.icon" class="sub-nav-icon"></i>
+                        </div>
+                        <span class="nav-label text-truncate flex-grow-1" :title="sub.label">{{ sub.label }}</span>
+                        
+                        <span v-if="sub.badge && sub.badge()" class="badge rounded-pill ms-auto ms-1 small fw-bold text-nowrap" :class="sub.badgeClass || 'bg-primary text-white'">
+                          {{ sub.badge() }}
+                        </span>
+                        <span v-else-if="sub.badgeText" class="badge rounded-pill ms-auto ms-1 small fw-bold text-nowrap" :class="sub.badgeClass || 'bg-light text-dark border'">
+                          {{ sub.badgeText }}
+                        </span>
+                      </router-link>
+                    </div>
+                  </transition>
+                </div>
+
+                <!-- Standard Single Route Item -->
+                <router-link
+                  v-else
+                  :to="item.to"
+                  class="material-nav-link"
                   :title="item.label"
                 >
                   <div class="nav-icon-box" :style="{ '--item-color': item.color }">
                     <i :class="item.icon" class="nav-icon"></i>
                   </div>
                   <span v-if="!isCollapsed" class="nav-label text-truncate flex-grow-1" :title="item.label">{{ item.label }}</span>
-
-                  <!-- Module Count Badge -->
-                  <span v-if="!isCollapsed && item.badgeText" class="badge rounded-pill ms-auto ms-1 small text-nowrap" :class="item.badgeClass || 'bg-light text-dark border'">
+                  
+                  <!-- Dynamic Count Badge -->
+                  <span v-if="!isCollapsed && item.badge && item.badge()" class="badge rounded-pill ms-auto ms-2 small fw-bold text-nowrap" :class="item.badgeClass || 'bg-primary text-white'">
+                    {{ item.badge() }}
+                  </span>
+                  <!-- Static Badge Text -->
+                  <span v-else-if="!isCollapsed && item.badgeText" class="badge rounded-pill ms-auto ms-2 small fw-bold text-nowrap" :class="item.badgeClass || 'bg-light text-dark border'">
                     {{ item.badgeText }}
                   </span>
-
-                  <!-- Submenu Accordion Chevron Indicator -->
-                  <i 
-                    v-if="!isCollapsed" 
-                    class="bi bi-chevron-down ms-1.5 fs-7 transition-transform" 
-                    :class="{ 'rotate-180': isDropdownOpen(item) }"
-                  ></i>
-                </div>
-
-                <!-- Collapsible Submenu Items -->
-                <transition name="submenu-slide">
-                  <div v-if="!isCollapsed && isDropdownOpen(item)" class="sidebar-submenu ps-2 pe-1 pt-1 pb-1">
-                    <router-link
-                      v-for="sub in item.children"
-                      :key="sub.to"
-                      :to="sub.to"
-                      class="material-nav-link submenu-nav-link"
-                      :title="sub.label"
-                    >
-                      <div class="submenu-icon-box me-2" :style="{ '--sub-color': sub.color }">
-                        <i :class="sub.icon" class="sub-nav-icon"></i>
-                      </div>
-                      <span class="nav-label text-truncate flex-grow-1" :title="sub.label">{{ sub.label }}</span>
-                      
-                      <span v-if="sub.badge && sub.badge()" class="badge rounded-pill ms-auto ms-1 small fw-bold text-nowrap" :class="sub.badgeClass || 'bg-primary text-white'">
-                        {{ sub.badge() }}
-                      </span>
-                      <span v-else-if="sub.badgeText" class="badge rounded-pill ms-auto ms-1 small fw-bold text-nowrap" :class="sub.badgeClass || 'bg-light text-dark border'">
-                        {{ sub.badgeText }}
-                      </span>
-                    </router-link>
-                  </div>
-                </transition>
-              </div>
-
-              <!-- Standard Single Route Item -->
-              <router-link
-                v-else
-                :to="item.to"
-                class="material-nav-link"
-                :title="item.label"
-              >
-                <div class="nav-icon-box" :style="{ '--item-color': item.color }">
-                  <i :class="item.icon" class="nav-icon"></i>
-                </div>
-                <span v-if="!isCollapsed" class="nav-label text-truncate flex-grow-1" :title="item.label">{{ item.label }}</span>
-                
-                <!-- Dynamic Count Badge -->
-                <span v-if="!isCollapsed && item.badge && item.badge()" class="badge rounded-pill ms-auto ms-2 small fw-bold text-nowrap" :class="item.badgeClass || 'bg-primary text-white'">
-                  {{ item.badge() }}
-                </span>
-                <!-- Static Badge Text -->
-                <span v-else-if="!isCollapsed && item.badgeText" class="badge rounded-pill ms-auto ms-2 small fw-bold text-nowrap" :class="item.badgeClass || 'bg-light text-dark border'">
-                  {{ item.badgeText }}
-                </span>
-              </router-link>
-            </template>
+                </router-link>
+              </template>
+            </div>
           </div>
         </nav>
 
         <!-- Sidebar Footer (Expanded) -->
         <div class="sidebar-footer p-2.5 border-top divider-color" v-if="!isCollapsed">
           <div class="d-flex align-items-center justify-content-between p-2 rounded-3 footer-user-pill mb-2">
-            <router-link to="/auth" class="d-flex align-items-center gap-2 overflow-hidden text-decoration-none flex-grow-1" title="Kelola Akun & Role Firebase">
+            <router-link to="/auth" class="d-flex align-items-center gap-2 overflow-hidden text-decoration-none flex-grow-1 me-1.5" title="Lihat Profil & Akun">
               <div class="avatar-kafeinarts position-relative" :class="{ 'bg-success': currentUser, 'bg-primary': !currentUser }">
                 <span v-if="!currentUser">K</span>
                 <span v-else>{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
@@ -199,9 +221,30 @@
                 </small>
               </div>
             </router-link>
-            <router-link to="/preferences" class="btn btn-sm btn-ghost p-1 text-sub" title="Pengaturan Sistem">
-              <i class="bi bi-gear-fill"></i>
-            </router-link>
+
+            <!-- Menu di samping Akun Tamu: Edit Profile & Logout -->
+            <div class="d-flex align-items-center gap-1 flex-shrink-0">
+              <!-- Tombol Edit Profile -->
+              <router-link 
+                to="/auth" 
+                class="btn btn-sm p-1.5 rounded-2 d-flex align-items-center justify-content-center footer-action-btn footer-edit-btn"
+                title="Edit Profil & Kelola Akun"
+                aria-label="Edit Profil"
+              >
+                <i class="bi bi-pencil-square" style="font-size: 12px;"></i>
+              </router-link>
+
+              <!-- Tombol Logout -->
+              <button 
+                type="button"
+                @click="triggerLogout" 
+                class="btn btn-sm p-1.5 rounded-2 d-flex align-items-center justify-content-center footer-action-btn footer-logout-btn"
+                :title="currentUser ? 'Logout (Keluar Sesi)' : 'Keluar / Masuk Akun'"
+                aria-label="Logout Akun"
+              >
+                <i class="bi bi-box-arrow-right" style="font-size: 12px;"></i>
+              </button>
+            </div>
           </div>
 
           <div class="d-flex flex-column gap-1.5">
@@ -222,6 +265,12 @@
 
         <!-- Sidebar Footer (Collapsed) -->
         <div class="sidebar-footer p-2 border-top divider-color text-center d-flex flex-column align-items-center gap-1.5" v-else>
+          <router-link to="/auth" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-primary" style="width: 36px; height: 36px;" title="Edit Profil & Kelola Akun">
+            <i class="bi bi-pencil-square fs-6"></i>
+          </router-link>
+          <button @click="triggerLogout" class="btn btn-sm btn-light border rounded-circle p-0 text-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Logout">
+            <i class="bi bi-box-arrow-right fs-6"></i>
+          </button>
           <button @click="enableDesktopMode" class="btn btn-sm btn-outline-primary border rounded-circle p-0" style="width: 38px; height: 38px;" title="Mode Desktop Samsung DeX">
             <i class="bi bi-display fs-6"></i>
           </button>
@@ -251,18 +300,19 @@
 
       <!-- Main Content Area -->
       <div :class="['main-content', { 
-        expanded: isCollapsed, 
-        'is-resizing': isResizingSidebar,
-        'is-sidebar-wide': sidebarWidth >= 330,
-        'is-sidebar-extra-wide': sidebarWidth >= 390
+        'no-sidebar': !showNavigation,
+        expanded: isCollapsed && showNavigation, 
+        'is-resizing': isResizingSidebar && showNavigation,
+        'is-sidebar-wide': sidebarWidth >= 330 && showNavigation,
+        'is-sidebar-extra-wide': sidebarWidth >= 390 && showNavigation
       }]">
-        <!-- Material Design 3 Top App Bar Header (NAVBAR) -->
-        <header class="top-header m3-top-app-bar border-bottom px-3 px-md-4 py-2 d-flex align-items-center justify-content-between sticky-top shadow-xs">
+        <!-- Material Design 3 Top App Bar Header (NAVBAR: Hanya tampil jika sudah login) -->
+        <header v-if="showNavigation" class="top-header m3-top-app-bar border-bottom px-3 px-md-4 py-2 d-flex align-items-center justify-content-between sticky-top shadow-xs">
           <div class="d-flex align-items-center gap-2">
             <!-- MOBILE: If on subpage, show prominent Back to Home button! -->
             <router-link
-              v-if="route.path !== '/'"
-              to="/"
+              v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'"
+              to="/home"
               class="btn btn-sm m3-back-btn d-flex align-items-center gap-1.5 fw-bold shadow-xs"
               title="Kembali ke Beranda (Dashboard)"
             >
@@ -292,14 +342,14 @@
             <div class="d-flex align-items-center gap-2 page-breadcrumb-pill">
               <!-- Desktop Back-to-home Breadcrumb link -->
               <router-link
-                v-if="route.path !== '/'"
-                to="/"
+                v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'"
+                to="/home"
                 class="d-none d-md-inline text-sub text-decoration-none hover-primary small fw-semibold breadcrumb-home-link"
                 title="Ke Dashboard Home"
               >
                 <i class="bi bi-house-door me-1"></i>Home
               </router-link>
-              <span v-if="route.path !== '/'" class="d-none d-md-inline text-muted small opacity-50">/</span>
+              <span v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'" class="d-none d-md-inline text-muted small opacity-50">/</span>
 
               <span class="page-title-badge"><i :class="currentPageIcon"></i></span>
               <span class="fw-bold text-app fs-6 page-title-text text-truncate" style="max-width: 220px;">
@@ -374,7 +424,7 @@
             </router-link>
 
             <!-- User Auth & Role Pill in Navbar -->
-            <router-link to="/auth" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" :title="currentUser ? `Role: ${userRole} (${currentUser.email})` : 'Login / Register & Role Akun'">
+            <router-link :to="currentUser ? '/auth' : '/login'" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" :title="currentUser ? `Role: ${userRole} (${currentUser.email})` : 'Login / Register & Role Akun'">
               <i :class="currentUser ? 'bi bi-person-check-fill text-primary' : 'bi bi-person text-secondary'" class="fs-6"></i>
               <span class="small fw-bold d-none d-sm-inline">{{ currentUser ? userRole : 'Masuk' }}</span>
             </router-link>
@@ -399,11 +449,11 @@
 
         <!-- Mobile Bottom Sheet Navigation Menu (Slides Up From Bottom) -->
         <transition name="overlay-fade">
-          <div class="offcanvas-overlay" v-if="mobileDrawer" @click="mobileDrawer = false"></div>
+          <div class="offcanvas-overlay" v-if="showNavigation && mobileDrawer" @click="mobileDrawer = false"></div>
         </transition>
         
         <transition name="sheet-slide-up">
-          <div class="mobile-bottom-sheet-menu px-3.5 pt-2 pb-4" v-if="mobileDrawer">
+          <div class="mobile-bottom-sheet-menu px-3.5 pt-2 pb-4" v-if="showNavigation && mobileDrawer">
             <!-- Drag Handle Indicator -->
             <div class="mobile-sheet-drag-handle-bar mb-2" @click="mobileDrawer = false">
               <span class="mobile-sheet-drag-pill"></span>
@@ -422,6 +472,46 @@
               <button class="btn btn-sm btn-light border rounded-circle shadow-sm" @click="mobileDrawer = false" title="Tutup Menu">
                 <i class="bi bi-x-lg"></i>
               </button>
+            </div>
+
+            <!-- Mobile User Status Pill with Edit Profile & Logout -->
+            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 footer-user-pill mb-2.5">
+              <router-link to="/auth" @click="mobileDrawer = false" class="d-flex align-items-center gap-2 overflow-hidden text-decoration-none flex-grow-1 me-1.5" title="Lihat Status Akun & Profil">
+                <div class="avatar-kafeinarts position-relative" :class="{ 'bg-success': currentUser, 'bg-primary': !currentUser }">
+                  <span v-if="!currentUser">K</span>
+                  <span v-else>{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
+                </div>
+                <div class="lh-1 text-truncate">
+                  <span class="fw-bold fs-7 text-app d-block text-truncate">
+                    {{ currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Akun Tamu' }}
+                  </span>
+                  <small class="fw-semibold" :class="currentUser ? 'text-success' : 'text-muted'" style="font-size: 10px;">
+                    {{ currentUser ? `● Role: ${userRole}` : 'Masuk / Tetapkan Role' }}
+                  </small>
+                </div>
+              </router-link>
+
+              <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                <router-link 
+                  to="/auth" 
+                  @click="mobileDrawer = false"
+                  class="btn btn-sm p-1.5 rounded-2 d-flex align-items-center justify-content-center footer-action-btn footer-edit-btn"
+                  title="Edit Profil & Kelola Akun"
+                  aria-label="Edit Profil"
+                >
+                  <i class="bi bi-pencil-square" style="font-size: 12px;"></i>
+                </router-link>
+
+                <button 
+                  type="button"
+                  @click="mobileDrawer = false; triggerLogout()" 
+                  class="btn btn-sm p-1.5 rounded-2 d-flex align-items-center justify-content-center footer-action-btn footer-logout-btn"
+                  :title="currentUser ? 'Logout (Keluar Sesi)' : 'Keluar / Masuk Akun'"
+                  aria-label="Logout Akun"
+                >
+                  <i class="bi bi-box-arrow-right" style="font-size: 12px;"></i>
+                </button>
+              </div>
             </div>
 
             <!-- Mobile Search Filter -->
@@ -532,7 +622,7 @@
         </transition>
 
         <!-- Main Router View Container with Snappy Lightweight Fade-Slide Animation -->
-        <div class="p-3 p-md-4 main-view-viewport" :class="{ 'cards-stacked-mode': shouldStackCards }">
+        <div :class="['main-view-viewport', showNavigation ? 'p-3 p-md-4' : 'p-0 min-vh-100', { 'cards-stacked-mode': shouldStackCards && showNavigation }]">
           <router-view v-slot="{ Component }">
             <transition name="fade-slide" mode="out-in">
               <component :is="Component" />
@@ -540,9 +630,9 @@
           </router-view>
         </div>
 
-        <!-- Material Design 3 Mobile Bottom Navigation Bar -->
-        <nav class="m3-bottom-nav d-lg-none border-top fixed-bottom d-flex justify-content-around align-items-center shadow-lg">
-          <router-link to="/" class="m3-bottom-nav-item" :class="{ active: route.path === '/' }">
+        <!-- Material Design 3 Mobile Bottom Navigation Bar (Hanya tampil jika sudah login) -->
+        <nav v-if="showNavigation" class="m3-bottom-nav d-lg-none border-top fixed-bottom d-flex justify-content-around align-items-center shadow-lg">
+          <router-link to="/home" class="m3-bottom-nav-item" :class="{ active: route.path === '/home' }">
             <div class="m3-nav-indicator">
               <i class="bi bi-grid-fill"></i>
             </div>
@@ -587,13 +677,14 @@
 <script>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import AppNotifications from './components/AppNotifications.vue';
 import DukungDevModal from './components/DukungDevModal.vue';
 import DesktopDexWorkspace from './components/DesktopDexWorkspace.vue';
+import LogoutConfirmModal from './components/LogoutConfirmModal.vue';
 import { saveNightlySnapshot, cleanLegacyLocalStorageSnapshot } from './utils/backupStorage';
 import { isStorageFull } from './utils/storageManager';
-import { auth, getUserProfileData } from './utils/firebase';
+import { auth, getUserProfileData, getHostSession, logoutUser } from './utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export default {
@@ -601,18 +692,101 @@ export default {
   components: {
     AppNotifications,
     DukungDevModal,
-    DesktopDexWorkspace
+    DesktopDexWorkspace,
+    LogoutConfirmModal
   },
   setup() {
     const store = useStore();
     const route = useRoute();
+    const router = useRouter();
     const isCollapsed = ref(false);
     const mobileDrawer = ref(false);
     const showDukungModal = ref(false);
     const sidebarSearch = ref('');
     const isStorageFullState = ref(isStorageFull());
-    const currentUser = ref(null);
-    const userRole = ref('member');
+    
+    // Initial user authentication state check (synchronous to prevent layout jump)
+    const initUser = () => {
+      const host = getHostSession();
+      if (host) return host;
+      const userSessionStr = localStorage.getItem('taskarts_user_session');
+      if (userSessionStr) {
+        try {
+          return JSON.parse(userSessionStr);
+        } catch (e) {}
+      }
+      return auth.currentUser || null;
+    };
+
+    const currentUser = ref(initUser());
+    const userRole = ref(currentUser.value?.isHostProject ? '👑 Host Project' : (currentUser.value?.role || 'Tamu'));
+
+    // Global synchronous auth refresher
+    const refreshAppAuthState = (explicitDetail = null) => {
+      if (explicitDetail) {
+        currentUser.value = explicitDetail;
+        userRole.value = explicitDetail.isHostProject ? '👑 Host Project' : (explicitDetail.role || 'member');
+        return;
+      }
+      const host = getHostSession();
+      if (host) {
+        currentUser.value = host;
+        userRole.value = '👑 Host Project';
+        return;
+      }
+
+      const userSessionStr = localStorage.getItem('taskarts_user_session');
+      if (userSessionStr) {
+        try {
+          const parsed = JSON.parse(userSessionStr);
+          currentUser.value = parsed;
+          userRole.value = parsed.role || 'member';
+          return;
+        } catch (e) {}
+      }
+
+      const fbUser = auth.currentUser;
+      if (fbUser) {
+        currentUser.value = fbUser;
+        getUserProfileData(fbUser.uid).then(prof => {
+          if (prof?.role) userRole.value = prof.role;
+        }).catch(() => {});
+        userRole.value = 'member';
+        return;
+      }
+
+      currentUser.value = null;
+      userRole.value = 'Tamu';
+    };
+
+    const isAuthRoute = computed(() => {
+      const p = route.path;
+      return p === '/login' || p === '/register' || p === '/';
+    });
+
+    const isUserLoggedIn = computed(() => {
+      if (currentUser.value) return true;
+      const active = initUser();
+      if (active) {
+        currentUser.value = active;
+        userRole.value = active.isHostProject ? '👑 Host Project' : (active.role || 'member');
+        return true;
+      }
+      return false;
+    });
+
+    // Sidebar & Main Top App Bar only shown when user is logged in AND not on auth routes
+    const showNavigation = computed(() => {
+      return isUserLoggedIn.value && !isAuthRoute.value;
+    });
+
+    // Watch route changes to ensure state is synchronized when moving from /login to internal views
+    watch(() => route.path, () => {
+      refreshAppAuthState();
+      if (window.innerWidth <= 992) {
+        mobileDrawer.value = false;
+      }
+    }, { immediate: true });
     
     // -------------------------------------------------------------
     // Resizable Desktop Sidebar (Drag Left & Right to Adjust Width)
@@ -746,7 +920,7 @@ export default {
       {
         title: 'WORKSPACE & PROYEK',
         items: [
-          { to: '/', label: 'Dashboard', icon: 'bi-grid-1x2-fill', color: '#2563eb' },
+          { to: '/home', label: 'Dashboard', icon: 'bi-grid-1x2-fill', color: '#2563eb' },
           { to: '/job-tracker', label: 'Simpan Lamaran Kerja', icon: 'bi-briefcase-fill', color: '#0ea5e9', badgeText: 'Glints/LinkedIn', badgeClass: 'bg-primary text-white' },
           { to: '/medium-draft', label: 'Medium Draft Suite', icon: 'bi-medium', color: '#10b981', badgeText: 'Siap Copas', badgeClass: 'bg-success text-white' },
           { to: '/todo', label: 'To-Do & Kanban', icon: 'bi-kanban-fill', color: '#f59e0b', badge: () => pendingTasksCount.value, badgeClass: 'bg-warning text-dark' },
@@ -825,6 +999,7 @@ export default {
       {
         title: 'SISTEM & PANDUAN',
         items: [
+          { to: '/login', label: 'Login & Gerbang Host', icon: 'bi-box-arrow-in-right', color: '#f59e0b', badgeText: 'Host Gate', badgeClass: 'bg-warning text-dark' },
           { to: '/auth', label: 'Akun, Role & Cloud', icon: 'bi-shield-lock-fill', color: '#4f46e5', badgeText: 'Firebase', badgeClass: 'bg-primary-subtle text-primary border border-primary-subtle' },
           { to: '/drive-vault', label: 'Google Drive Vault', icon: 'bi-google', color: '#10b981', badgeText: 'Drive API', badgeClass: 'bg-success-subtle text-success border border-success-subtle' },
           { to: '/storage', label: 'Storage & Kuota', icon: 'bi-hdd-stack-fill', color: '#0284c7', badge: () => isStorageFullState.value ? 'Penuh!' : null, badgeClass: 'bg-danger text-white' },
@@ -883,6 +1058,37 @@ export default {
       'finance-modules': true
     });
 
+    // Collapsible navigation groups in main sidebar
+    const collapsedNavGroups = ref({});
+    const isNavGroupOpen = (title) => {
+      return !collapsedNavGroups.value[title];
+    };
+    const toggleNavGroup = (title) => {
+      collapsedNavGroups.value[title] = !collapsedNavGroups.value[title];
+    };
+
+    // Logout Modal & Handler (Tombol Logout di samping Akun Tamu)
+    const showLogoutModal = ref(false);
+    const triggerLogout = () => {
+      showLogoutModal.value = true;
+    };
+    const confirmLogout = async () => {
+      showLogoutModal.value = false;
+      try {
+        await logoutUser();
+      } catch (err) {
+        console.warn('Logout notice:', err);
+      }
+      currentUser.value = null;
+      userRole.value = 'Tamu';
+      store.dispatch('showNotification', {
+        type: 'info',
+        title: '🔒 Sesi Berakhir',
+        message: 'Anda telah berhasil logout dari akun.'
+      });
+      router.push('/login');
+    };
+
     const isDropdownOpen = (item) => {
       if (!item || !item.id) return false;
       if (item._forceOpen) return true;
@@ -934,7 +1140,11 @@ export default {
 
     // Dynamic Title & Icon based on Active Route
     const routeTitles = {
-      '/': { title: 'Dashboard Executive', icon: 'bi-grid-1x2-fill' },
+      '/': { title: 'Gerbang Autentikasi & Login', icon: 'bi-box-arrow-in-right' },
+      '/login': { title: 'Gerbang Autentikasi & Login', icon: 'bi-box-arrow-in-right' },
+      '/register': { title: 'Pendaftaran Akun Baru', icon: 'bi-person-plus-fill' },
+      '/home': { title: 'Dashboard Executive', icon: 'bi-grid-1x2-fill' },
+      '/dashboard': { title: 'Dashboard Executive', icon: 'bi-grid-1x2-fill' },
       '/job-tracker': { title: 'Simpan Lamaran Kerja (Glints/LinkedIn)', icon: 'bi-briefcase-fill' },
       '/medium-draft': { title: 'Medium Draft & Story Builder', icon: 'bi-medium' },
       '/todo': { title: 'To-Do & Kanban OS', icon: 'bi-kanban-fill' },
@@ -1117,17 +1327,19 @@ export default {
       window.addEventListener('storage-quota-full', updateStorageState);
       window.addEventListener('resize', onWindowResize, { passive: true });
 
-      // Firebase Auth Listener to keep reactive role & user state in navbar
-      onAuthStateChanged(auth, async (user) => {
-        currentUser.value = user;
-        if (user) {
-          try {
-            const prof = await getUserProfileData(user.uid);
-            userRole.value = prof?.role || 'member';
-          } catch (e) {
-            userRole.value = 'member';
-          }
-        } else {
+      // Auth & Role Listener to keep reactive role & user state in navbar and sidebar
+      refreshAppAuthState();
+      const onAuthChangedHandler = (e) => {
+        refreshAppAuthState(e?.detail);
+      };
+      window.addEventListener('taskarts-auth-changed', onAuthChangedHandler);
+      window.addEventListener('storage', () => refreshAppAuthState());
+
+      onAuthStateChanged(auth, (fbUser) => {
+        if (fbUser) {
+          refreshAppAuthState();
+        } else if (!getHostSession() && !localStorage.getItem('taskarts_user_session')) {
+          currentUser.value = null;
           userRole.value = 'Tamu';
         }
       });
@@ -1237,7 +1449,15 @@ export default {
       isParentActive,
       toggleDropdown,
       expandedDropdowns,
-      shouldStackCards
+      shouldStackCards,
+      isNavGroupOpen,
+      toggleNavGroup,
+      showLogoutModal,
+      triggerLogout,
+      confirmLogout,
+      showNavigation,
+      isAuthRoute,
+      isUserLoggedIn
     };
   }
 };
@@ -2210,6 +2430,61 @@ body.sidebar-resizing * {
   border: 1px solid var(--sidebar-divider);
 }
 
+/* Sidebar Footer Action Buttons (Edit Profile & Logout di samping Akun Tamu) */
+.footer-action-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--sidebar-divider, #e2e8f0);
+  background-color: var(--bg-surface, #ffffff);
+  color: var(--text-main, #334155);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.footer-edit-btn:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.footer-logout-btn {
+  color: #ef4444;
+}
+
+.footer-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.dark-theme .footer-action-btn,
+.oled-theme .footer-action-btn {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--sidebar-divider, #334155);
+  color: #cbd5e1;
+}
+
+.dark-theme .footer-edit-btn:hover,
+.oled-theme .footer-edit-btn:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.dark-theme .footer-logout-btn,
+.oled-theme .footer-logout-btn {
+  color: #f87171;
+}
+
+.dark-theme .footer-logout-btn:hover,
+.oled-theme .footer-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
 /* Page Breadcrumb Pill */
 .page-breadcrumb-pill {
   padding: 5px 13px;
@@ -2269,6 +2544,13 @@ body.sidebar-resizing * {
 
 .main-content.expanded {
   margin-left: var(--sidebar-collapsed-width);
+}
+
+.main-content.no-sidebar {
+  margin-left: 0 !important;
+  padding-bottom: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .top-header {

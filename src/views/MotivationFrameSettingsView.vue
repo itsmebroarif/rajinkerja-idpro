@@ -812,11 +812,11 @@ export default {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       window.alert('Pengaturan bingkai 3D & motivasi kerja berhasil disimpan!');
-      router.push('/');
+      router.push('/home');
     };
 
     const goBack = () => {
-      router.push('/');
+      router.push('/home');
     };
 
     onMounted(() => {

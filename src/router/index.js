@@ -1,11 +1,27 @@
 import { createRouter, createWebHistory } from "vue-router";
+import LoginView from "../views/LoginView.vue";
 import HomeView from "../views/HomeView.vue";
+import { isAuthenticated } from "../utils/firebase";
 
 const routes = [
   {
     path: "/",
+    name: "login-root",
+    component: LoginView,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: LoginView,
+  },
+  {
+    path: "/home",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/dashboard",
+    redirect: "/home",
   },
   {
     path: "/contacts",
@@ -366,12 +382,9 @@ const routes = [
     component: () => import("../views/AuthRoleAccountView.vue"),
   },
   {
-    path: "/login",
-    redirect: "/auth",
-  },
-  {
     path: "/register",
-    redirect: "/auth",
+    name: "register",
+    component: () => import("../views/RegisterView.vue"),
   },
   {
     path: "/account",
@@ -398,6 +411,29 @@ const router = createRouter({
   scrollBehavior() {
     return { top: 0 };
   }
+});
+
+// Navigation Guard: Pastikan halaman diproteksi sampai pengguna berhasil login
+router.beforeEach((to, from, next) => {
+  const authRoutes = ['/login', '/register'];
+  const isAuthPath = authRoutes.includes(to.path);
+  const authed = isAuthenticated();
+
+  // Route root "/" diarahkan ke /home jika sudah login, atau ke /login jika belum
+  if (to.path === '/') {
+    if (authed) {
+      return next('/home');
+    } else {
+      return next('/login');
+    }
+  }
+
+  // Jika belum login dan mencoba mengakses rute dalam aplikasi (seperti /home, /todo, /finance, dll)
+  if (!isAuthPath && !authed) {
+    return next({ path: '/login', query: { redirect: to.fullPath } });
+  }
+
+  next();
 });
 
 router.onError((error) => {

@@ -11,7 +11,7 @@
         <p class="text-muted mb-0">Input ide, pengingat, catatan kilat, atau alarm kerja secara instant tanpa berpindah-pindah menu.</p>
       </div>
 
-      <router-link to="/" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold align-self-start align-self-md-center">
+      <router-link to="/home" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold align-self-start align-self-md-center">
         <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
       </router-link>
     </div>
