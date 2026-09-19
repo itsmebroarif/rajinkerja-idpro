@@ -109,7 +109,8 @@
               :title="`Klik untuk toggle kategori ${group.title}`"
             >
               <div class="d-flex align-items-center gap-1.5">
-                <span>{{ group.title }}</span>
+                <i v-if="group.icon" :class="group.icon" class="sidebar-category-icon text-muted" style="font-size: 11px;"></i>
+                <span class="sidebar-category-title">{{ group.title }}</span>
                 <i 
                   class="bi bi-chevron-down ms-1 text-muted transition-transform" 
                   :class="{ 'rotate-180': !isNavGroupOpen(group.title) }" 
@@ -224,14 +225,14 @@
 
             <!-- Menu di samping Akun Tamu: Edit Profile & Logout -->
             <div class="d-flex align-items-center gap-1 flex-shrink-0">
-              <!-- Tombol Edit Profile -->
+              <!-- Tombol Preferences / Settings -->
               <router-link 
-                to="/auth" 
+                to="/preferences" 
                 class="btn btn-sm p-1.5 rounded-2 d-flex align-items-center justify-content-center footer-action-btn footer-edit-btn"
-                title="Edit Profil & Kelola Akun"
-                aria-label="Edit Profil"
+                title="Pengaturan & Preferensi Workspace"
+                aria-label="Pengaturan"
               >
-                <i class="bi bi-pencil-square" style="font-size: 12px;"></i>
+                <i class="bi bi-gear-fill" style="font-size: 12px;"></i>
               </router-link>
 
               <!-- Tombol Logout -->
@@ -247,35 +248,33 @@
             </div>
           </div>
 
-          <div class="d-flex flex-column gap-1.5">
+          <div class="d-flex align-items-center gap-1.5">
             <!-- Mode Desktop Switcher in Sidebar -->
-            <button @click="enableDesktopMode" class="btn btn-sm btn-outline-primary rounded-pill d-flex align-items-center justify-content-center gap-1.5 py-1.5 fw-semibold" style="font-size: 11.5px;" title="Aktifkan Mode Desktop Samsung DeX">
-              <i class="bi bi-display"></i> Mode Desktop (DeX)
+            <button @click="enableDesktopMode" class="btn btn-sm btn-outline-primary rounded-pill flex-grow-1 d-flex align-items-center justify-content-center gap-1.5 py-1.5 fw-semibold" style="font-size: 11.5px;" title="Aktifkan Mode Desktop Samsung DeX">
+              <i class="bi bi-display"></i> Mode DeX
             </button>
-            <div class="d-flex gap-1.5">
-              <router-link to="/preferences" class="btn btn-sm btn-outline-theme rounded-pill flex-grow-1 d-flex align-items-center justify-content-center gap-1.5 py-1.5" style="font-size: 11.5px;">
-                <i class="bi bi-palette"></i> Tema
-              </router-link>
-              <button @click="showDukungModal = true" class="btn btn-sm btn-success-subtle text-success border border-success-subtle rounded-pill fw-bold d-flex align-items-center justify-content-center gap-1 px-3 py-1.5" style="font-size: 11.5px;" title="Dukung Pengembang">
-                <i class="bi bi-heart-fill"></i> Dukung
-              </button>
-            </div>
+            <button @click="showDukungModal = true" class="btn btn-sm btn-success-subtle text-success border border-success-subtle rounded-pill fw-bold d-flex align-items-center justify-content-center gap-1 px-3 py-1.5" style="font-size: 11.5px;" title="Dukung Pengembang">
+              <i class="bi bi-heart-fill"></i> Dukung
+            </button>
           </div>
         </div>
 
         <!-- Sidebar Footer (Collapsed) -->
         <div class="sidebar-footer p-2 border-top divider-color text-center d-flex flex-column align-items-center gap-1.5" v-else>
           <router-link to="/auth" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-primary" style="width: 36px; height: 36px;" title="Edit Profil & Kelola Akun">
-            <i class="bi bi-pencil-square fs-6"></i>
+            <i class="bi bi-shield-lock-fill fs-6"></i>
           </router-link>
-          <button @click="triggerLogout" class="btn btn-sm btn-light border rounded-circle p-0 text-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Logout">
-            <i class="bi bi-box-arrow-right fs-6"></i>
-          </button>
-          <button @click="enableDesktopMode" class="btn btn-sm btn-outline-primary border rounded-circle p-0" style="width: 38px; height: 38px;" title="Mode Desktop Samsung DeX">
+          <router-link to="/preferences" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-secondary" style="width: 36px; height: 36px;" title="Pengaturan">
+            <i class="bi bi-gear-fill fs-6"></i>
+          </router-link>
+          <button @click="enableDesktopMode" class="btn btn-sm btn-outline-primary border rounded-circle p-0" style="width: 36px; height: 36px;" title="Mode Desktop Samsung DeX">
             <i class="bi bi-display fs-6"></i>
           </button>
-          <button @click="showDukungModal = true" class="btn btn-sm btn-light border rounded-circle p-0 mb-2" style="width: 38px; height: 38px;" title="☕ Dukung Dev">
+          <button @click="showDukungModal = true" class="btn btn-sm btn-light border rounded-circle p-0" style="width: 36px; height: 36px;" title="☕ Dukung Dev">
             <i class="bi bi-heart-fill text-danger fs-6"></i>
+          </button>
+          <button @click="triggerLogout" class="btn btn-sm btn-light border rounded-circle p-0 text-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Logout">
+            <i class="bi bi-box-arrow-right fs-6"></i>
           </button>
         </div>
 
@@ -306,10 +305,11 @@
         'is-sidebar-wide': sidebarWidth >= 330 && showNavigation,
         'is-sidebar-extra-wide': sidebarWidth >= 390 && showNavigation
       }]">
-        <!-- Material Design 3 Top App Bar Header (NAVBAR: Hanya tampil jika sudah login) -->
+        <!-- Clean, Re-architectured Top App Bar (NAVBAR) -->
         <header v-if="showNavigation" class="top-header m3-top-app-bar border-bottom px-3 px-md-4 py-2 d-flex align-items-center justify-content-between sticky-top shadow-xs">
+          <!-- Left: Sidebar Toggle & Clean Breadcrumb -->
           <div class="d-flex align-items-center gap-2">
-            <!-- MOBILE: If on subpage, show prominent Back to Home button! -->
+            <!-- MOBILE: Back to Home button on subpage -->
             <router-link
               v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'"
               to="/home"
@@ -320,130 +320,284 @@
               <span>Home</span>
             </router-link>
 
-            <!-- MOBILE & TABLET: Menu button to open bottom sheet -->
+            <!-- MOBILE & TABLET: Menu button to open bottom drawer -->
             <button
-              class="btn btn-sm btn-icon-m3 d-lg-none rounded-circle"
+              class="btn btn-sm btn-icon-clean d-lg-none rounded-circle"
               @click="mobileDrawer = true"
-              title="Buka Menu Navigasi (Slide Bawah)"
+              title="Buka Menu Navigasi"
             >
               <i class="bi bi-list fs-5"></i>
             </button>
 
             <!-- DESKTOP: Sidebar collapse toggle -->
             <button
-              class="btn btn-sm btn-icon-m3 d-none d-lg-flex rounded-circle me-1"
+              class="btn btn-sm btn-icon-clean d-none d-lg-flex rounded-circle"
               @click="isCollapsed = !isCollapsed"
               :title="isCollapsed ? 'Perluas Sidebar' : 'Ciutkan Sidebar'"
             >
               <i :class="isCollapsed ? 'bi bi-layout-sidebar-reverse' : 'bi bi-layout-sidebar'"></i>
             </button>
             
-            <!-- Dynamic Breadcrumb / Page Title Badge -->
-            <div class="d-flex align-items-center gap-2 page-breadcrumb-pill">
-              <!-- Desktop Back-to-home Breadcrumb link -->
+            <!-- Dynamic Clean Breadcrumb & Page Badge -->
+            <div class="d-flex align-items-center gap-2 page-breadcrumb-clean ms-1">
               <router-link
                 v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'"
                 to="/home"
-                class="d-none d-md-inline text-sub text-decoration-none hover-primary small fw-semibold breadcrumb-home-link"
+                class="breadcrumb-back-chip d-none d-sm-flex align-items-center gap-1 text-decoration-none"
                 title="Ke Dashboard Home"
               >
-                <i class="bi bi-house-door me-1"></i>Home
+                <i class="bi bi-arrow-left-short fs-6"></i>
+                <span>Home</span>
               </router-link>
-              <span v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'" class="d-none d-md-inline text-muted small opacity-50">/</span>
+              <span v-if="route.path !== '/home' && route.path !== '/' && route.path !== '/login'" class="breadcrumb-separator d-none d-sm-inline">/</span>
 
-              <span class="page-title-badge"><i :class="currentPageIcon"></i></span>
-              <span class="fw-bold text-app fs-6 page-title-text text-truncate" style="max-width: 220px;">
-                {{ currentPageTitle }}
-              </span>
+              <div class="page-title-badge-clean d-flex align-items-center gap-2">
+                <span class="page-icon-box"><i :class="currentPageIcon"></i></span>
+                <span class="fw-bold text-app fs-6 page-title-clean text-truncate">
+                  {{ currentPageTitle }}
+                </span>
+              </div>
             </div>
           </div>
 
+          <!-- Right: Consolidated, Clean Action Cluster -->
           <div class="d-flex align-items-center gap-2">
-            <!-- MODE DESKTOP OS (Samsung DeX & Windows Style) Switcher Trigger in Navbar -->
+            <!-- 1. Mode Desktop (Samsung DeX & Windows Style) -->
             <button 
               @click="enableDesktopMode" 
-              class="btn btn-sm btn-dex-mode-navbar rounded-pill px-2.5 px-md-3 py-1.5 d-flex align-items-center gap-1.5 fw-bold shadow-xs text-nowrap"
-              title="Beralih ke Mode Desktop (Tampilan OS seperti Windows & Samsung DeX)"
+              class="btn btn-sm btn-dex-pill rounded-pill px-2.5 px-md-3 py-1.5 d-flex align-items-center gap-1.5 fw-semibold"
+              title="Beralih ke Tampilan Desktop OS (Samsung DeX & Windows Style)"
               id="navbar-desktop-mode-btn"
             >
-              <i class="bi bi-display fs-6 text-primary"></i>
-              <span class="d-none d-sm-inline">Mode Desktop</span>
-              <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.2" style="font-size: 10px;">DeX</span>
+              <i class="bi bi-display text-primary"></i>
+              <span class="d-none d-lg-inline">DeX Mode</span>
             </button>
 
-            <!-- Quick Capture Launcher -->
-            <router-link to="/quick-capture" class="btn btn-sm btn-light border rounded-pill px-3 py-1.5 d-none d-sm-flex align-items-center gap-1.5 quick-search-pill text-sub" title="Quick Capture (Catatan & Alarm)">
-              <i class="bi bi-lightning-charge-fill text-warning"></i>
-              <span class="small fw-semibold">Quick Capture</span>
-              <kbd class="badge bg-secondary-subtle text-secondary py-0.5 px-1.5 ms-1 border" style="font-size: 10px;">⚡</kbd>
-            </router-link>
+            <!-- 2. Consolidated Aksi Cepat (Quick Tools Dropdown) -->
+            <div class="position-relative">
+              <button 
+                type="button" 
+                @click.stop="toggleQuickTools" 
+                class="btn btn-sm btn-quick-tools rounded-pill px-2.5 px-md-3 py-1.5 d-flex align-items-center gap-1.5 fw-semibold"
+                :class="{ active: isQuickToolsOpen }"
+                title="Aksi & Alat Cepat"
+                id="navbar-quick-tools-btn"
+              >
+                <i class="bi bi-grid-fill text-primary"></i>
+                <span class="d-none d-md-inline">Aksi Cepat</span>
+                <span v-if="isBudgetExceeded" class="quick-tools-alert-dot" title="Peringatan Anggaran!"></span>
+                <i class="bi bi-chevron-down ms-0.5 fs-8 transition-transform" :class="{ 'rotate-180': isQuickToolsOpen }"></i>
+              </button>
 
-            <!-- Quick Camera Shortcut Button (Desktop / Tablet) -->
-            <router-link to="/camera" class="btn btn-sm btn-light border rounded-circle p-0 d-none d-md-flex align-items-center justify-content-center header-icon-btn" title="Scan Dokumen & Kamera">
-              <i class="bi bi-camera-fill text-secondary fs-6"></i>
-            </router-link>
+              <!-- Quick Tools Popover Dropdown -->
+              <transition name="dropdown-popover">
+                <div v-if="isQuickToolsOpen" @click.stop class="quick-tools-popover shadow-lg rounded-3 border p-2.5">
+                  <div class="d-flex align-items-center justify-content-between px-2 py-1 mb-1 border-bottom pb-2">
+                    <span class="fw-bold fs-7 text-muted text-uppercase tracking-wider">Aksi & Alat Cepat</span>
+                    <button type="button" @click="closeNavbarDropdowns" class="btn btn-sm btn-link text-muted p-0 text-decoration-none">
+                      <i class="bi bi-x-lg fs-7"></i>
+                    </button>
+                  </div>
 
-            <!-- Quick Mood Tracker & Alarm Shortcut Button (Desktop / Tablet) -->
-            <router-link to="/mood" class="btn btn-sm btn-light border rounded-circle p-0 d-none d-md-flex align-items-center justify-content-center header-icon-btn" title="Kamera Mood & Alarm Kerja">
-              <i class="bi bi-emoji-smile-fill text-danger fs-6"></i>
-            </router-link>
+                  <!-- Budget Exceeded Notice Banner inside Tools if triggered -->
+                  <div v-if="isBudgetExceeded" class="alert alert-danger py-1.5 px-2.5 mb-2 rounded-2 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-1.5 small lh-1">
+                      <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
+                      <span class="fw-bold">Anggaran terlampaui!</span>
+                    </div>
+                    <router-link to="/finance" @click="closeNavbarDropdowns" class="btn btn-xs btn-danger text-white rounded-pill px-2 py-0.5 small fw-bold text-decoration-none">
+                      Cek Kas
+                    </router-link>
+                  </div>
 
-            <!-- Budget Alert Warning if exceeded -->
-            <router-link to="/finance" v-if="isBudgetExceeded" class="badge bg-danger-subtle text-danger border border-danger rounded-circle p-0 d-flex align-items-center justify-content-center header-icon-btn text-decoration-none" title="Peringatan: Pengeluaran Melebihi Anggaran!">
-              <i class="bi bi-exclamation-triangle-fill fs-6"></i>
-            </router-link>
+                  <div class="quick-tools-grid">
+                    <router-link to="/quick-capture" @click="closeNavbarDropdowns" class="quick-tool-card text-decoration-none">
+                      <div class="quick-tool-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                      </div>
+                      <div class="quick-tool-info">
+                        <div class="quick-tool-title">Quick Capture</div>
+                        <div class="quick-tool-desc">Catatan kilat & ide spontan</div>
+                      </div>
+                    </router-link>
 
-            <!-- Accent Mode Switcher Button (Blue Mode vs Pink Mode) -->
-            <button 
-              @click="toggleBluePinkMode" 
-              class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-flex align-items-center gap-1.5 header-icon-btn text-nowrap"
-              :title="isPinkMode ? 'Mode Pink Aktif (Klik untuk ganti ke Blue Mode)' : 'Mode Blue Aktif (Klik untuk ganti ke Pink Mode)'"
-              style="font-size: 11.5px; height: 32px; width: auto;"
-            >
-              <span class="rounded-circle d-inline-block" :style="{ width: '10px', height: '10px', backgroundColor: accentColor, boxShadow: '0 0 0 1px rgba(0,0,0,0.15)' }"></span>
-              <span class="fw-bold d-none d-sm-inline" :style="{ color: isPinkMode ? '#ec4899' : '#2563eb' }">
-                {{ isPinkMode ? '🌸 Pink' : '🔵 Blue' }}
-              </span>
-            </button>
+                    <router-link to="/camera" @click="closeNavbarDropdowns" class="quick-tool-card text-decoration-none">
+                      <div class="quick-tool-icon bg-danger-subtle text-danger">
+                        <i class="bi bi-camera-fill"></i>
+                      </div>
+                      <div class="quick-tool-info">
+                        <div class="quick-tool-title">Scan Dokumen</div>
+                        <div class="quick-tool-desc">Kamera & OCR berkas</div>
+                      </div>
+                    </router-link>
 
-            <!-- Theme Switcher Button (Light / Dark / OLED True Black) -->
-            <button 
-              @click="toggleThemeMode" 
-              class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center header-icon-btn" 
-              :title="themeMode === 'light' ? 'Mode Terang (Klik untuk Dark Slate)' : (themeMode === 'dark' ? 'Mode Gelap Slate (Klik untuk OLED True Black)' : 'True Black OLED (Klik untuk Mode Terang)')"
-            >
-              <i v-if="themeMode === 'light'" class="bi bi-sun-fill text-warning fs-6"></i>
-              <i v-else-if="themeMode === 'dark'" class="bi bi-moon-stars-fill text-info fs-6"></i>
-              <i v-else class="bi bi-circle-fill text-white bg-dark rounded-circle border border-secondary p-0.5" style="font-size: 10px;"></i>
-            </button>
+                    <router-link to="/drive-vault" @click="closeNavbarDropdowns" class="quick-tool-card text-decoration-none">
+                      <div class="quick-tool-icon bg-success-subtle text-success">
+                        <i class="bi bi-google"></i>
+                      </div>
+                      <div class="quick-tool-info">
+                        <div class="quick-tool-title">Google Drive Vault</div>
+                        <div class="quick-tool-desc">Upload & sinkron cloud</div>
+                      </div>
+                    </router-link>
 
-            <!-- Drive Upload Vault Header Button -->
-            <router-link to="/drive-vault" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-none d-md-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" title="Google Drive Vault & Upload Dokumen">
-              <i class="bi bi-google text-success fs-6"></i>
-              <span class="small fw-semibold d-none d-lg-inline">Drive</span>
-            </router-link>
+                    <router-link to="/mood" @click="closeNavbarDropdowns" class="quick-tool-card text-decoration-none">
+                      <div class="quick-tool-icon bg-info-subtle text-info">
+                        <i class="bi bi-emoji-smile-fill"></i>
+                      </div>
+                      <div class="quick-tool-info">
+                        <div class="quick-tool-title">Mood & Alarm Kerja</div>
+                        <div class="quick-tool-desc">Deteksi senyum & ritme kerja</div>
+                      </div>
+                    </router-link>
+                  </div>
+                </div>
+              </transition>
+            </div>
 
-            <!-- User Auth & Role Pill in Navbar -->
-            <router-link :to="currentUser ? '/auth' : '/login'" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" :title="currentUser ? `Role: ${userRole} (${currentUser.email})` : 'Login / Register & Role Akun'">
-              <i :class="currentUser ? 'bi bi-person-check-fill text-primary' : 'bi bi-person text-secondary'" class="fs-6"></i>
-              <span class="small fw-bold d-none d-sm-inline">{{ currentUser ? userRole : 'Masuk' }}</span>
-            </router-link>
+            <!-- 3. Appearance Controls (Compact Theme & Accent Pill) -->
+            <div class="d-flex align-items-center gap-1.5 p-1 rounded-pill theme-accent-wrapper border">
+              <!-- Accent Mode Switcher Button (Blue Mode vs Pink Mode) -->
+              <button 
+                type="button"
+                @click="toggleBluePinkMode" 
+                class="btn btn-sm btn-accent-toggle rounded-pill px-2 py-1 d-flex align-items-center gap-1.5"
+                :title="isPinkMode ? 'Mode Pink Aktif (Klik untuk Blue Mode)' : 'Mode Blue Aktif (Klik untuk Pink Mode)'"
+              >
+                <span class="accent-dot" :style="{ backgroundColor: accentColor }"></span>
+                <span class="accent-label fw-bold d-none d-xl-inline" :style="{ color: isPinkMode ? '#ec4899' : '#2563eb' }">
+                  {{ isPinkMode ? 'Pink' : 'Blue' }}
+                </span>
+              </button>
 
-            <!-- Storage Link (Desktop & Tablet) -->
-            <router-link
-              to="/storage"
-              class="btn btn-sm border rounded-circle p-0 d-none d-sm-flex align-items-center justify-content-center header-icon-btn position-relative"
-              :class="isStorageFullState ? 'btn-danger text-white' : 'btn-light text-secondary'"
-              title="Kapasitas & Kuota Storage"
-            >
-              <i class="bi bi-hdd-stack-fill fs-6" :class="isStorageFullState ? 'text-white' : 'text-primary'"></i>
-              <span v-if="isStorageFullState" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-            </router-link>
+              <!-- Theme Switcher Button (Light / Dark / OLED True Black) -->
+              <button 
+                type="button"
+                @click="toggleThemeMode" 
+                class="btn btn-sm btn-theme-toggle rounded-circle d-flex align-items-center justify-content-center" 
+                :title="themeMode === 'light' ? 'Mode Terang (Klik untuk Dark Slate)' : (themeMode === 'dark' ? 'Mode Gelap Slate (Klik untuk OLED True Black)' : 'True Black OLED (Klik untuk Mode Terang)')"
+              >
+                <i v-if="themeMode === 'light'" class="bi bi-sun-fill text-warning fs-6"></i>
+                <i v-else-if="themeMode === 'dark'" class="bi bi-moon-stars-fill text-info fs-6"></i>
+                <i v-else class="bi bi-circle-fill text-white" style="font-size: 10px;"></i>
+              </button>
+            </div>
 
-            <!-- Preferences Link -->
-            <router-link to="/preferences" class="btn btn-sm btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center header-icon-btn" title="Pengaturan Aplikasi">
-              <i class="bi bi-gear-fill text-primary fs-6"></i>
-            </router-link>
+            <!-- 4. Consolidated User Profile & Workspace Hub (Replaces 4 scattered buttons) -->
+            <div class="position-relative">
+              <button 
+                type="button" 
+                @click.stop="toggleUserMenu"
+                class="btn btn-sm navbar-user-chip rounded-pill p-1 pe-2.5 d-flex align-items-center gap-2 border"
+                :class="{ active: isUserMenuOpen }"
+                title="Menu Akun & Pengaturan"
+                id="navbar-user-menu-btn"
+              >
+                <div class="user-chip-avatar position-relative" :class="{ 'bg-success': currentUser, 'bg-primary': !currentUser }">
+                  <span v-if="!currentUser">K</span>
+                  <span v-else>{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
+                  <span class="status-indicator" :class="currentUser ? 'status-online' : 'status-guest'"></span>
+                </div>
+                <div class="d-none d-sm-flex flex-column text-start lh-1 me-1">
+                  <span class="fw-bold fs-7 text-app text-truncate" style="max-width: 105px;">
+                    {{ currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Akun Tamu' }}
+                  </span>
+                  <span class="user-role-caption text-truncate" style="max-width: 105px;">
+                    {{ userRole }}
+                  </span>
+                </div>
+                <i class="bi bi-chevron-down text-muted fs-8 transition-transform" :class="{ 'rotate-180': isUserMenuOpen }"></i>
+              </button>
+
+              <!-- User Profile & Workspace Dropdown Popover -->
+              <transition name="dropdown-popover">
+                <div v-if="isUserMenuOpen" @click.stop class="navbar-user-popover shadow-lg rounded-3 border p-3">
+                  <!-- User Header Card -->
+                  <div class="d-flex align-items-center gap-2.5 pb-3 border-bottom">
+                    <div class="popover-avatar-lg" :class="{ 'bg-success': currentUser, 'bg-primary': !currentUser }">
+                      <span v-if="!currentUser">K</span>
+                      <span v-else>{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
+                    </div>
+                    <div class="lh-1 flex-grow-1 overflow-hidden">
+                      <div class="fw-bold fs-6 text-app text-truncate">
+                        {{ currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Akun Tamu' }}
+                      </div>
+                      <div class="text-muted small text-truncate mt-0.5" style="font-size: 11px;">
+                        {{ currentUser?.email || 'Belum masuk akun' }}
+                      </div>
+                      <div class="mt-1.5">
+                        <span class="badge rounded-pill" :class="currentUser?.isHostProject ? 'bg-warning text-dark fw-bold' : (currentUser ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-secondary-subtle text-secondary')">
+                          {{ userRole }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Storage Bar Indicator Widget inside User Card -->
+                  <div class="storage-bar-widget mt-2.5 p-2 rounded-2 border">
+                    <div class="d-flex align-items-center justify-content-between small mb-1">
+                      <span class="fw-semibold text-sub d-flex align-items-center gap-1">
+                        <i class="bi bi-hdd-stack-fill text-primary"></i> Kuota Storage
+                      </span>
+                      <span class="small fw-bold" :class="storageStats.isFull ? 'text-danger' : (storageStats.isWarning ? 'text-warning' : 'text-muted')">
+                        {{ storageStats.formattedUsed }} / {{ storageStats.formattedQuota }}
+                      </span>
+                    </div>
+                    <div class="progress" style="height: 5px;">
+                      <div 
+                        class="progress-bar" 
+                        :class="storageStats.isFull ? 'bg-danger' : (storageStats.isWarning ? 'bg-warning' : 'bg-primary')" 
+                        :style="{ width: `${storageStats.percentUsed}%` }"
+                      ></div>
+                    </div>
+                    <div class="text-end mt-1">
+                      <router-link to="/storage" @click="closeNavbarDropdowns" class="small text-decoration-none text-primary fw-semibold" style="font-size: 11px;">
+                        Kelola Ruang & Cadangan →
+                      </router-link>
+                    </div>
+                  </div>
+
+                  <!-- Navigation Action Items -->
+                  <div class="user-popover-links mt-2 d-flex flex-column gap-1">
+                    <router-link to="/auth" @click="closeNavbarDropdowns" class="user-popover-item text-decoration-none">
+                      <i class="bi bi-shield-lock-fill text-primary fs-6"></i>
+                      <div class="flex-grow-1">
+                        <div class="popover-item-title">Akun & Role Cloud</div>
+                        <div class="popover-item-desc">Firebase, profil, & hak akses</div>
+                      </div>
+                    </router-link>
+
+                    <router-link to="/preferences" @click="closeNavbarDropdowns" class="user-popover-item text-decoration-none">
+                      <i class="bi bi-gear-fill text-info fs-6"></i>
+                      <div class="flex-grow-1">
+                        <div class="popover-item-title">Pengaturan & Preferensi</div>
+                        <div class="popover-item-desc">Tema, layout, & opsi workspace</div>
+                      </div>
+                    </router-link>
+
+                    <button type="button" @click="showDukungModal = true; closeNavbarDropdowns()" class="user-popover-item btn-clean text-start">
+                      <i class="bi bi-heart-fill text-danger fs-6"></i>
+                      <div class="flex-grow-1">
+                        <div class="popover-item-title">Dukung Developer</div>
+                        <div class="popover-item-desc">Traktir kopi & apresiasi karya</div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <!-- Divider & Logout Button -->
+                  <div class="border-top pt-2 mt-2">
+                    <button 
+                      type="button" 
+                      @click="triggerLogout(); closeNavbarDropdowns()" 
+                      class="btn btn-sm btn-outline-danger w-100 rounded-pill py-1.5 d-flex align-items-center justify-content-center gap-1.5 fw-semibold"
+                    >
+                      <i class="bi bi-box-arrow-right"></i>
+                      <span>{{ currentUser ? 'Keluar Sesi (Logout)' : 'Keluar Akun' }}</span>
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
         </header>
 
@@ -683,7 +837,7 @@ import DukungDevModal from './components/DukungDevModal.vue';
 import DesktopDexWorkspace from './components/DesktopDexWorkspace.vue';
 import LogoutConfirmModal from './components/LogoutConfirmModal.vue';
 import { saveNightlySnapshot, cleanLegacyLocalStorageSnapshot } from './utils/backupStorage';
-import { isStorageFull } from './utils/storageManager';
+import { isStorageFull, calculateStorageUsage } from './utils/storageManager';
 import { auth, getUserProfileData, getHostSession, logoutUser } from './utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -919,6 +1073,7 @@ export default {
     const navGroups = [
       {
         title: 'WORKSPACE & PROYEK',
+        icon: 'bi-grid-1x2-fill',
         items: [
           { to: '/home', label: 'Dashboard', icon: 'bi-grid-1x2-fill', color: '#2563eb' },
           { to: '/job-tracker', label: 'Simpan Lamaran Kerja', icon: 'bi-briefcase-fill', color: '#0ea5e9', badgeText: 'Glints/LinkedIn', badgeClass: 'bg-primary text-white' },
@@ -933,6 +1088,7 @@ export default {
       },
       {
         title: 'TIM & KOMUNIKASI',
+        icon: 'bi-people-fill',
         items: [
           {
             id: 'team-modules',
@@ -957,6 +1113,7 @@ export default {
       },
       {
         title: 'KEUANGAN & DATA',
+        icon: 'bi-bank',
         items: [
           {
             id: 'finance-modules',
@@ -983,6 +1140,7 @@ export default {
       },
       {
         title: 'AGENDA & PRODUKTIVITAS',
+        icon: 'bi-lightning-charge-fill',
         items: [
           { to: '/productivity-insights', label: 'Productivity Insights', icon: 'bi-bar-chart-line-fill', color: '#2563eb', badgeText: 'D3.js', badgeClass: 'bg-primary text-white' },
           { to: '/quick-capture', label: 'Quick Capture Notes', icon: 'bi-lightning-charge-fill', color: '#f59e0b' },
@@ -998,6 +1156,7 @@ export default {
       },
       {
         title: 'SISTEM & PANDUAN',
+        icon: 'bi-gear-wide-connected',
         items: [
           { to: '/login', label: 'Login & Gerbang Host', icon: 'bi-box-arrow-in-right', color: '#f59e0b', badgeText: 'Host Gate', badgeClass: 'bg-warning text-dark' },
           { to: '/auth', label: 'Akun, Role & Cloud', icon: 'bi-shield-lock-fill', color: '#4f46e5', badgeText: 'Firebase', badgeClass: 'bg-primary-subtle text-primary border border-primary-subtle' },
@@ -1089,6 +1248,53 @@ export default {
       router.push('/login');
     };
 
+    // Navbar Clean Popovers & Tools state
+    const isQuickToolsOpen = ref(false);
+    const isUserMenuOpen = ref(false);
+
+    const toggleQuickTools = (e) => {
+      if (e) e.stopPropagation();
+      isUserMenuOpen.value = false;
+      isQuickToolsOpen.value = !isQuickToolsOpen.value;
+    };
+
+    const toggleUserMenu = (e) => {
+      if (e) e.stopPropagation();
+      isQuickToolsOpen.value = false;
+      isUserMenuOpen.value = !isUserMenuOpen.value;
+    };
+
+    const closeNavbarDropdowns = () => {
+      isQuickToolsOpen.value = false;
+      isUserMenuOpen.value = false;
+    };
+
+    // Storage Usage Stats for User Profile Popover
+    const storageStats = ref({
+      formattedUsed: '0 B',
+      formattedQuota: '5 GB',
+      percentUsed: 0,
+      isWarning: false,
+      isFull: false
+    });
+
+    const refreshStorageStats = () => {
+      try {
+        const info = calculateStorageUsage();
+        if (info) {
+          storageStats.value = {
+            formattedUsed: info.formattedUsed || '0 B',
+            formattedQuota: info.formattedQuota || '5 GB',
+            percentUsed: Math.min(100, Math.round((info.percentUsed || 0) * 10) / 10),
+            isWarning: info.isWarning || false,
+            isFull: info.isFull || false
+          };
+        }
+      } catch (e) {
+        console.warn('Storage stats calculation note:', e);
+      }
+    };
+
     const isDropdownOpen = (item) => {
       if (!item || !item.id) return false;
       if (item._forceOpen) return true;
@@ -1111,6 +1317,8 @@ export default {
 
     // Auto-open parent dropdown when navigating to any child route
     watch(() => route.path, (newPath) => {
+      closeNavbarDropdowns();
+      refreshStorageStats();
       navGroups.forEach(g => {
         g.items.forEach(item => {
           if (item.children && item.id) {
@@ -1327,6 +1535,10 @@ export default {
       window.addEventListener('storage-quota-full', updateStorageState);
       window.addEventListener('resize', onWindowResize, { passive: true });
 
+      // Window click listener to close navbar popovers when clicking outside
+      window.addEventListener('click', closeNavbarDropdowns);
+      refreshStorageStats();
+
       // Auth & Role Listener to keep reactive role & user state in navbar and sidebar
       refreshAppAuthState();
       const onAuthChangedHandler = (e) => {
@@ -1347,6 +1559,7 @@ export default {
 
     onUnmounted(() => {
       window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('click', closeNavbarDropdowns);
       window.removeEventListener('storage-quota-updated', updateStorageState);
       window.removeEventListener('storage-quota-full', updateStorageState);
       window.removeEventListener('resize', onWindowResize);
@@ -1457,7 +1670,14 @@ export default {
       confirmLogout,
       showNavigation,
       isAuthRoute,
-      isUserLoggedIn
+      isUserLoggedIn,
+      isQuickToolsOpen,
+      isUserMenuOpen,
+      toggleQuickTools,
+      toggleUserMenu,
+      closeNavbarDropdowns,
+      storageStats,
+      refreshStorageStats
     };
   }
 };
@@ -2485,7 +2705,374 @@ body.sidebar-resizing * {
   color: #fca5a5;
 }
 
-/* Page Breadcrumb Pill */
+/* Page Breadcrumb & Header Clean Navigation */
+.btn-icon-clean {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sub, #64748b);
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.btn-icon-clean:hover {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  color: var(--text-main, #0f172a);
+}
+
+.page-breadcrumb-clean {
+  font-size: 13px;
+}
+
+.breadcrumb-back-chip {
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  color: var(--text-sub, #64748b);
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: all 0.18s ease;
+}
+
+.breadcrumb-back-chip:hover {
+  color: var(--primary-color, #2563eb);
+  border-color: var(--primary-color, #2563eb);
+}
+
+.breadcrumb-separator {
+  color: var(--text-sub, #94a3b8);
+  font-size: 12px;
+}
+
+.page-title-badge-clean {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-icon-box {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--primary-color, #2563eb);
+  font-size: 13px;
+}
+
+.page-title-clean {
+  letter-spacing: -0.2px;
+}
+
+/* DeX Pill in Navbar */
+.btn-dex-pill {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-main, #1e293b);
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-dex-pill:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: var(--primary-color, #2563eb);
+  color: var(--primary-color, #2563eb);
+}
+
+/* Quick Tools Navbar Trigger & Popover */
+.btn-quick-tools {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-main, #1e293b);
+  font-size: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.btn-quick-tools:hover,
+.btn-quick-tools.active {
+  background-color: rgba(37, 99, 235, 0.12);
+  border-color: var(--primary-color, #2563eb);
+  color: var(--primary-color, #2563eb);
+}
+
+.quick-tools-alert-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  display: inline-block;
+  animation: pulse-alert 1.5s infinite;
+}
+
+@keyframes pulse-alert {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.25); }
+}
+
+.quick-tools-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 290px;
+  background-color: var(--bg-surface, #ffffff);
+  border-color: var(--border-color, #e2e8f0) !important;
+  z-index: 1060;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.quick-tools-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quick-tool-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.18s ease;
+  color: inherit;
+}
+
+.quick-tool-card:hover {
+  background-color: var(--sidebar-hover-bg, #f8fafc);
+  transform: translateX(2px);
+}
+
+.quick-tool-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.quick-tool-info {
+  min-width: 0;
+}
+
+.quick-tool-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.quick-tool-desc {
+  font-size: 10.5px;
+  color: var(--text-sub, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Theme & Accent Pill Controls */
+.theme-accent-wrapper {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  border-color: var(--border-color, #e2e8f0) !important;
+}
+
+.btn-accent-toggle {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  padding: 3px 7px !important;
+  color: var(--text-main, #1e293b);
+  transition: all 0.18s ease;
+}
+
+.btn-accent-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.accent-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.btn-theme-toggle {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  transition: all 0.18s ease;
+}
+
+.btn-theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Navbar User Chip & Dropdown */
+.navbar-user-chip {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+  border-color: var(--border-color, #e2e8f0) !important;
+  color: var(--text-main, #1e293b);
+  transition: all 0.2s ease;
+}
+
+.navbar-user-chip:hover,
+.navbar-user-chip.active {
+  border-color: var(--primary-color, #2563eb) !important;
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+.user-chip-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+}
+
+.status-online {
+  background-color: #10b981;
+}
+
+.status-guest {
+  background-color: #94a3b8;
+}
+
+.user-role-caption {
+  font-size: 10px;
+  color: var(--text-sub, #64748b);
+  font-weight: 500;
+}
+
+.navbar-user-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 290px;
+  background-color: var(--bg-surface, #ffffff);
+  border-color: var(--border-color, #e2e8f0) !important;
+  z-index: 1060;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.popover-avatar-lg {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.storage-bar-widget {
+  background-color: var(--sidebar-hover-bg, #f8fafc);
+  border-color: var(--border-color, #e2e8f0) !important;
+}
+
+.user-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.18s ease;
+  color: inherit;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+.user-popover-item:hover {
+  background-color: var(--sidebar-hover-bg, #f1f5f9);
+}
+
+.popover-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+}
+
+.popover-item-desc {
+  font-size: 10px;
+  color: var(--text-sub, #64748b);
+}
+
+/* Dropdown Popover Animations */
+.dropdown-popover-enter-active,
+.dropdown-popover-leave-active {
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown-popover-enter-from,
+.dropdown-popover-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+}
+
+/* Sidebar Category Icons & Labels */
+.sidebar-category-icon {
+  opacity: 0.7;
+}
+
+.sidebar-category-title {
+  font-weight: 800;
+}
+
+/* Dark and OLED Overrides for Popovers and Chips */
+.dark-theme .quick-tools-popover,
+.oled-theme .quick-tools-popover,
+.dark-theme .navbar-user-popover,
+.oled-theme .navbar-user-popover {
+  background-color: var(--bg-surface, #1e293b);
+  border-color: var(--border-color, #334155) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme .storage-bar-widget,
+.oled-theme .storage-bar-widget {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color, #334155) !important;
+}
+
+.dark-theme .quick-tool-card:hover,
+.oled-theme .quick-tool-card:hover,
+.dark-theme .user-popover-item:hover,
+.oled-theme .user-popover-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark-theme .status-indicator,
+.oled-theme .status-indicator {
+  border-color: var(--bg-surface, #1e293b);
+}
+
+/* Page Breadcrumb Pill (Legacy support) */
 .page-breadcrumb-pill {
   padding: 5px 13px;
   border-radius: 9999px;
