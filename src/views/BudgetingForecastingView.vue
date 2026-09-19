@@ -316,14 +316,14 @@
                   <label class="form-label fw-bold small text-dark">Batas Plafon Anggaran (IDR) <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                    <input type="number" class="form-control" v-model.number="formBudget.budgetCeiling" min="1000000" step="500000" placeholder="100000000" required />
+                    <input type="number" class="form-control" v-model.number="formBudget.budgetCeiling" min="1000000" step="500000" placeholder="Contoh: 100000000" required />
                   </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Realisasi Terpakai Saat Ini (IDR)</label>
                   <div class="input-group">
                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                    <input type="number" class="form-control" v-model.number="formBudget.spentAmount" min="0" step="500000" placeholder="50000000" />
+                    <input type="number" class="form-control" v-model.number="formBudget.spentAmount" min="0" step="500000" placeholder="Contoh: 0" />
                   </div>
                 </div>
               </div>
@@ -332,7 +332,7 @@
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Ambang Peringatan Alert (%) <span class="text-danger">*</span></label>
                   <div class="input-group">
-                    <input type="number" class="form-control" v-model.number="formBudget.alertThresholdPercent" min="50" max="99" placeholder="80" required />
+                    <input type="number" class="form-control" v-model.number="formBudget.alertThresholdPercent" min="50" max="99" placeholder="Contoh: 80" required />
                     <span class="input-group-text bg-white">%</span>
                   </div>
                   <div class="form-text small">Peringatan otomatis muncul saat penyerapan mencapai batas ini.</div>
@@ -415,8 +415,8 @@ export default {
     const formBudget = ref({
       department: '',
       period: 'Q3 2026',
-      budgetCeiling: 100000000,
-      spentAmount: 0,
+      budgetCeiling: null,
+      spentAmount: null,
       alertThresholdPercent: 80,
       notifyHead: true,
       headEmail: '',
@@ -510,8 +510,8 @@ export default {
       formBudget.value = {
         department: '',
         period: 'Q3 2026',
-        budgetCeiling: 100000000,
-        spentAmount: 0,
+        budgetCeiling: null,
+        spentAmount: null,
         alertThresholdPercent: 80,
         notifyHead: true,
         headEmail: '',

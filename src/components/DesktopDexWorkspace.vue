@@ -771,6 +771,8 @@ export default {
       { id: 'time-suite', name: 'Time & Pomodoro', to: '/time-suite', icon: 'bi-clock-history', color: '#16a34a', category: 'Produktivitas' },
 
       // Column 5: Personal & System
+      { id: 'auth', name: 'Akun & Role', to: '/auth', icon: 'bi-shield-lock-fill', color: '#4f46e5', category: 'Sistem' },
+      { id: 'drive-vault', name: 'Google Drive', to: '/drive-vault', icon: 'bi-google', color: '#10b981', category: 'Sistem' },
       { id: 'notes', name: 'Sticky Notes', to: '/notes', icon: 'bi-journal-text', color: '#64748b', category: 'Tools' },
       { id: 'diary', name: 'Jurnal Cerita', to: '/diary', icon: 'bi-book-half', color: '#ca8a04', category: 'Tools' },
       { id: 'code-notes', name: 'Code Snippets', to: '/code-notes', icon: 'bi-code-slash', color: '#0284c7', category: 'Tools' },

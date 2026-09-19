@@ -553,7 +553,7 @@
                       v-model.number="formTrans.amount"
                       min="1000"
                       step="1000"
-                      placeholder="1000000"
+                      placeholder="Contoh: 1000000"
                       required
                     />
                   </div>
@@ -861,7 +861,7 @@ export default {
         category: 'Operasional',
         account: 'Bank BCA Utama',
         paymentMethod: 'Transfer Bank',
-        refNumber: 'TRF-' + Math.floor(10000 + Math.random() * 90000),
+        refNumber: '',
         verified: true,
         notes: ''
       };

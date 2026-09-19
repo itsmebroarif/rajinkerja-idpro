@@ -427,11 +427,11 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nama Karyawan Pemohon <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formClaim.employeeName" placeholder="Dimas Wicaksono" required />
+                  <input type="text" class="form-control" v-model.trim="formClaim.employeeName" placeholder="Contoh: Dimas Wicaksono" required />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nomor Induk Karyawan (NIK) <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formClaim.employeeId" placeholder="EMP-1049" required />
+                  <input type="text" class="form-control" v-model.trim="formClaim.employeeId" placeholder="Contoh: EMP-1049" required />
                 </div>
               </div>
 
@@ -463,7 +463,7 @@
                   <label class="form-label fw-bold small text-dark">Jumlah Nominal Reimbursement (IDR) <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                    <input type="number" class="form-control" v-model.number="formClaim.amount" min="1000" step="500" placeholder="850000" required />
+                    <input type="number" class="form-control" v-model.number="formClaim.amount" min="1000" step="500" placeholder="Contoh: 850000" required />
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -475,7 +475,7 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nama Toko / Merchant / Restoran</label>
-                  <input type="text" class="form-control" v-model.trim="formClaim.merchantName" placeholder="The Grand Cafe Jakarta" />
+                  <input type="text" class="form-control" v-model.trim="formClaim.merchantName" placeholder="Contoh: The Grand Cafe Jakarta" />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Metode Pencairan Reimbursement</label>
@@ -570,8 +570,8 @@ export default {
     const isEditingClaim = ref(false);
     const editingClaimId = ref(null);
     const formClaim = ref({
-      employeeName: 'Arif Permana Putrasuryana',
-      employeeId: 'EMP-1001',
+      employeeName: '',
+      employeeId: '',
       department: 'Teknologi & Produk',
       expenseDate: new Date().toISOString().substring(0, 10),
       amount: '',
@@ -628,8 +628,8 @@ export default {
       isEditingClaim.value = false;
       editingClaimId.value = null;
       formClaim.value = {
-        employeeName: 'Arif Permana Putrasuryana',
-        employeeId: 'EMP-1001',
+        employeeName: '',
+        employeeId: '',
         department: 'Teknologi & Produk',
         expenseDate: new Date().toISOString().substring(0, 10),
         amount: '',

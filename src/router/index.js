@@ -359,6 +359,36 @@ const routes = [
   {
     path: "/team-directory",
     redirect: "/team-expertise",
+  },
+  {
+    path: "/auth",
+    name: "auth-role-account",
+    component: () => import("../views/AuthRoleAccountView.vue"),
+  },
+  {
+    path: "/login",
+    redirect: "/auth",
+  },
+  {
+    path: "/register",
+    redirect: "/auth",
+  },
+  {
+    path: "/account",
+    redirect: "/auth",
+  },
+  {
+    path: "/drive-vault",
+    name: "drive-vault",
+    component: () => import("../views/GoogleDriveVaultView.vue"),
+  },
+  {
+    path: "/drive",
+    redirect: "/drive-vault",
+  },
+  {
+    path: "/google-drive",
+    redirect: "/drive-vault",
   }
 ];
 

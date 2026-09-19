@@ -152,11 +152,19 @@
             </div>
           </div>
 
-          <!-- Action Save Buttons -->
+            <!-- Action Save Buttons -->
           <div v-if="capturedImage" class="pt-3 border-top d-flex flex-column gap-2">
-            <button @click="saveToNotes" class="btn btn-primary rounded-pill fw-bold w-100 py-2.5 d-flex align-items-center justify-content-center gap-2">
+            <button @click="saveToNotes" class="btn btn-primary rounded-pill fw-bold w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-xs">
               <i class="bi bi-journal-plus fs-5"></i> Simpan ke Notes & Scratchpad
             </button>
+
+            <!-- Upload Direct to Google Drive -->
+            <button @click="uploadToDrive" :disabled="isDriveUploading" class="btn btn-success rounded-pill fw-bold w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-xs">
+              <span v-if="isDriveUploading" class="spinner-border spinner-border-sm" role="status"></span>
+              <i v-else class="bi bi-google"></i>
+              <span>{{ isDriveUploading ? 'Mengunggah ke Drive...' : 'Unggah Dokumen ke Google Drive' }}</span>
+            </button>
+
             <div class="d-flex gap-2">
               <button @click="downloadImage" class="btn btn-outline-secondary rounded-pill fw-semibold flex-fill py-2 d-flex align-items-center justify-content-center gap-1 small">
                 <i class="bi bi-download"></i> Unduh Foto (PNG)
@@ -210,6 +218,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import { sendOnDeviceNotification } from '../utils/notification';
 import { openPdfBlobInNewTab } from '../utils/pdfTabOpener';
+import { uploadFileToGoogleDrive } from '../utils/googleDrive';
+import { auth } from '../utils/firebase';
 import jsPDF from 'jspdf';
 
 export default {
@@ -370,6 +380,50 @@ export default {
     };
 
     const isPdfLoading = ref(false);
+    const isDriveUploading = ref(false);
+
+    const dataURItoBlob = (dataURI) => {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    };
+
+    const uploadToDrive = async () => {
+      if (!capturedImage.value || isDriveUploading.value) return;
+      isDriveUploading.value = true;
+      try {
+        const blob = dataURItoBlob(capturedImage.value);
+        const fileName = `${docTitle.value.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'scan_dokumen'}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        const userId = auth.currentUser?.uid || 'anonymous';
+        const result = await uploadFileToGoogleDrive(file, userId, {
+          title: docTitle.value || 'Pindaian Kamera',
+          notes: docNotes.value || '',
+          source: 'camera_scanner'
+        });
+
+        store.dispatch('showNotification', {
+          type: 'success',
+          title: '☁️ Terunggah ke Google Drive',
+          message: `Berkas "${result.name}" berhasil disimpan di Google Drive.`
+        });
+      } catch (err) {
+        console.error('Upload Drive error:', err);
+        store.dispatch('showNotification', {
+          type: 'danger',
+          title: 'Gagal Unggah Drive',
+          message: err.message || 'Terjadi kendala saat mengunggah ke Google Drive.'
+        });
+      } finally {
+        isDriveUploading.value = false;
+      }
+    };
 
     const downloadPdf = () => {
       if (!capturedImage.value || isPdfLoading.value) return;
@@ -437,7 +491,9 @@ export default {
       saveToNotes,
       downloadImage,
       isPdfLoading,
-      downloadPdf
+      downloadPdf,
+      isDriveUploading,
+      uploadToDrive
     };
   }
 };

@@ -521,11 +521,11 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nomor Faktur Piutang <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formAr.invoiceNumber" placeholder="INV-AR-2026-005" required />
+                  <input type="text" class="form-control" v-model.trim="formAr.invoiceNumber" placeholder="Contoh: INV-AR-2026-005" required />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nama Klien / Perusahaan <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formAr.clientName" placeholder="PT Nusantara Digital" minlength="3" required />
+                  <input type="text" class="form-control" v-model.trim="formAr.clientName" placeholder="Contoh: PT Nusantara Digital" minlength="3" required />
                 </div>
               </div>
 
@@ -545,7 +545,7 @@
                   <label class="form-label fw-bold small text-dark">Nominal Tagihan (IDR) <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                    <input type="number" class="form-control" v-model.number="formAr.amount" min="10000" step="1000" placeholder="50000000" required />
+                    <input type="number" class="form-control" v-model.number="formAr.amount" min="10000" step="1000" placeholder="Contoh: 50000000" required />
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -634,11 +634,11 @@
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nama Vendor / Supplier <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formAp.vendorName" placeholder="PT Supplier Utama" required />
+                  <input type="text" class="form-control" v-model.trim="formAp.vendorName" placeholder="Contoh: PT Supplier Utama" required />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small text-dark">Nomor Faktur Vendor <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model.trim="formAp.vendorBillNumber" placeholder="INV-VND-99210" required />
+                  <input type="text" class="form-control" v-model.trim="formAp.vendorBillNumber" placeholder="Contoh: INV-VND-99210" required />
                 </div>
               </div>
 
@@ -647,7 +647,7 @@
                   <label class="form-label fw-bold small text-dark">Nominal Tagihan (IDR) <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text bg-light fw-bold">Rp</span>
-                    <input type="number" class="form-control" v-model.number="formAp.amount" min="10000" step="1000" placeholder="15000000" required />
+                    <input type="number" class="form-control" v-model.number="formAp.amount" min="10000" step="1000" placeholder="Contoh: 15000000" required />
                   </div>
                 </div>
                 <div class="col-md-6">

@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile with role authorization and metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "Email address" },
+        "displayName": { "type": "string", "description": "Full name or nickname" },
+        "photoURL": { "type": "string", "description": "Avatar URL" },
+        "role": { "type": "string", "enum": ["admin", "manager", "member", "freelancer", "client"], "description": "Account permission role" },
+        "department": { "type": "string", "description": "Department or business unit" },
+        "status": { "type": "string", "enum": ["active", "suspended", "pending"], "description": "Account status" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Task items organized by user or team",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "priority": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "ownerId"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Client projects and timelines",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "client": { "type": "string" },
+        "status": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "deadline": { "type": "string" },
+        "rate": { "type": "number" },
+        "progress": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "ownerId"]
+    },
+    "DriveFile": {
+      "title": "DriveFile",
+      "description": "Files, images, and documents uploaded or linked to Google Drive",
+      "type": "object",
+      "properties": {
+        "driveFileId": { "type": "string" },
+        "name": { "type": "string" },
+        "mimeType": { "type": "string" },
+        "size": { "type": "number" },
+        "webViewLink": { "type": "string" },
+        "thumbnailLink": { "type": "string" },
+        "uploadedBy": { "type": "string" },
+        "module": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["driveFileId", "name", "uploadedBy"]
+    },
+    "UserDataStore": {
+      "title": "UserDataStore",
+      "description": "User synced stores for invoices, expenses, diary, and configs",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string" },
+        "storeKey": { "type": "string" },
+        "payload": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "storeKey"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile with role definition"
+    },
+    "/users/{userId}/data/{storeKey}": {
+      "schema": "UserDataStore",
+      "description": "User personal partitioned synced data"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Shared or personal tasks"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Projects managed in app"
+    },
+    "/drive_files/{fileId}": {
+      "schema": "DriveFile",
+      "description": "Metadata of images and documents uploaded to Google Drive"
+    }
+  }
+}

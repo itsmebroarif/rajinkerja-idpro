@@ -185,15 +185,20 @@
         <!-- Sidebar Footer (Expanded) -->
         <div class="sidebar-footer p-2.5 border-top divider-color" v-if="!isCollapsed">
           <div class="d-flex align-items-center justify-content-between p-2 rounded-3 footer-user-pill mb-2">
-            <div class="d-flex align-items-center gap-2 overflow-hidden">
-              <div class="avatar-kafeinarts">
-                <span>K</span>
+            <router-link to="/auth" class="d-flex align-items-center gap-2 overflow-hidden text-decoration-none flex-grow-1" title="Kelola Akun & Role Firebase">
+              <div class="avatar-kafeinarts position-relative" :class="{ 'bg-success': currentUser, 'bg-primary': !currentUser }">
+                <span v-if="!currentUser">K</span>
+                <span v-else>{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
               </div>
               <div class="lh-1 text-truncate">
-                <span class="fw-bold fs-7 text-app d-block text-truncate">Kafeinarts</span>
-                <small class="text-success fw-semibold" style="font-size: 10px;">● Workspace Siap</small>
+                <span class="fw-bold fs-7 text-app d-block text-truncate">
+                  {{ currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Akun Tamu' }}
+                </span>
+                <small class="fw-semibold" :class="currentUser ? 'text-success' : 'text-muted'" style="font-size: 10px;">
+                  {{ currentUser ? `● Role: ${userRole}` : 'Masuk / Tetapkan Role' }}
+                </small>
               </div>
-            </div>
+            </router-link>
             <router-link to="/preferences" class="btn btn-sm btn-ghost p-1 text-sub" title="Pengaturan Sistem">
               <i class="bi bi-gear-fill"></i>
             </router-link>
@@ -361,6 +366,18 @@
               <i v-else-if="themeMode === 'dark'" class="bi bi-moon-stars-fill text-info fs-6"></i>
               <i v-else class="bi bi-circle-fill text-white bg-dark rounded-circle border border-secondary p-0.5" style="font-size: 10px;"></i>
             </button>
+
+            <!-- Drive Upload Vault Header Button -->
+            <router-link to="/drive-vault" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-none d-md-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" title="Google Drive Vault & Upload Dokumen">
+              <i class="bi bi-google text-success fs-6"></i>
+              <span class="small fw-semibold d-none d-lg-inline">Drive</span>
+            </router-link>
+
+            <!-- User Auth & Role Pill in Navbar -->
+            <router-link to="/auth" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 d-flex align-items-center gap-1.5 header-icon-btn text-decoration-none" :title="currentUser ? `Role: ${userRole} (${currentUser.email})` : 'Login / Register & Role Akun'">
+              <i :class="currentUser ? 'bi bi-person-check-fill text-primary' : 'bi bi-person text-secondary'" class="fs-6"></i>
+              <span class="small fw-bold d-none d-sm-inline">{{ currentUser ? userRole : 'Masuk' }}</span>
+            </router-link>
 
             <!-- Storage Link (Desktop & Tablet) -->
             <router-link
@@ -576,6 +593,8 @@ import DukungDevModal from './components/DukungDevModal.vue';
 import DesktopDexWorkspace from './components/DesktopDexWorkspace.vue';
 import { saveNightlySnapshot, cleanLegacyLocalStorageSnapshot } from './utils/backupStorage';
 import { isStorageFull } from './utils/storageManager';
+import { auth, getUserProfileData } from './utils/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default {
   name: 'App',
@@ -592,6 +611,8 @@ export default {
     const showDukungModal = ref(false);
     const sidebarSearch = ref('');
     const isStorageFullState = ref(isStorageFull());
+    const currentUser = ref(null);
+    const userRole = ref('member');
     
     // -------------------------------------------------------------
     // Resizable Desktop Sidebar (Drag Left & Right to Adjust Width)
@@ -804,6 +825,8 @@ export default {
       {
         title: 'SISTEM & PANDUAN',
         items: [
+          { to: '/auth', label: 'Akun, Role & Cloud', icon: 'bi-shield-lock-fill', color: '#4f46e5', badgeText: 'Firebase', badgeClass: 'bg-primary-subtle text-primary border border-primary-subtle' },
+          { to: '/drive-vault', label: 'Google Drive Vault', icon: 'bi-google', color: '#10b981', badgeText: 'Drive API', badgeClass: 'bg-success-subtle text-success border border-success-subtle' },
           { to: '/storage', label: 'Storage & Kuota', icon: 'bi-hdd-stack-fill', color: '#0284c7', badge: () => isStorageFullState.value ? 'Penuh!' : null, badgeClass: 'bg-danger text-white' },
           { to: '/preferences', label: 'Preferences & Tema', icon: 'bi-sliders', color: '#2563eb' },
           { to: '/faq', label: 'Info & Hidden Features', icon: 'bi-question-circle-fill', color: '#0891b2' },
@@ -952,6 +975,8 @@ export default {
       '/storage/view': { title: 'Inspeksi Kunci & Detail JSON', icon: 'bi-code-square' },
       '/storage': { title: 'Storage & Kapasitas Local Storage', icon: 'bi-hdd-stack-fill' },
       '/preferences': { title: 'Preferences & Pengaturan', icon: 'bi-sliders' },
+      '/auth': { title: 'Firebase Auth & Role Management', icon: 'bi-shield-lock-fill' },
+      '/drive-vault': { title: 'Google Drive Upload Vault', icon: 'bi-google' },
       '/faq': { title: 'Panduan & Hidden Features', icon: 'bi-question-circle-fill' },
       '/developer': { title: 'Developer Portfolio', icon: 'bi-person-badge-fill' }
     };
@@ -1091,6 +1116,21 @@ export default {
       window.addEventListener('storage-quota-updated', updateStorageState);
       window.addEventListener('storage-quota-full', updateStorageState);
       window.addEventListener('resize', onWindowResize, { passive: true });
+
+      // Firebase Auth Listener to keep reactive role & user state in navbar
+      onAuthStateChanged(auth, async (user) => {
+        currentUser.value = user;
+        if (user) {
+          try {
+            const prof = await getUserProfileData(user.uid);
+            userRole.value = prof?.role || 'member';
+          } catch (e) {
+            userRole.value = 'member';
+          }
+        } else {
+          userRole.value = 'Tamu';
+        }
+      });
     });
 
     onUnmounted(() => {
@@ -1186,6 +1226,8 @@ export default {
       enableDesktopMode,
       disableDesktopMode,
       toggleDesktopMode,
+      currentUser,
+      userRole,
       sidebarWidth,
       isResizingSidebar,
       startSidebarResize,
