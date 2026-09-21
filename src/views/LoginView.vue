@@ -1,243 +1,128 @@
 <template>
-  <div class="login-view-wrapper py-4 py-md-5" data-aos="fade-up">
-    <div class="container">
+  <div class="login-view-wrapper py-4 py-sm-5" data-aos="fade-up">
+    <div class="container px-3 px-sm-4">
       <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+        <!-- Optimized Container Width: Compact, Elegant, Perfectly Proportioned -->
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
           
           <!-- BRAND & WORKSPACE HEADER -->
           <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-4 shadow-sm bg-white border mb-3">
-              <img src="/logo.svg" alt="TaskArts Logo" style="width: 48px; height: 48px;" />
+            <div class="brand-avatar d-inline-flex align-items-center justify-content-center p-2.5 rounded-4 shadow-xs bg-white border mb-2.5">
+              <img src="/logo.svg" alt="TaskArts Logo" style="width: 40px; height: 40px;" />
             </div>
-            <h2 class="fw-black text-dark mb-1 d-flex align-items-center justify-content-center gap-2">
-              <span>Task<span class="text-primary">Arts</span></span>
-              <span class="badge bg-warning text-dark fs-7 px-2.5 py-1 rounded-pill fw-bold">By Kafeinarts</span>
-            </h2>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+              Task<span class="text-primary">Arts</span>
+            </h3>
             <p class="text-muted small mb-0">
-              Workspace Terpadu Manajemen Proyek, Arus Kas & Produktivitas Tim
+              Workspace Manajemen Proyek & Produktivitas Tim
             </p>
           </div>
 
           <!-- ACTIVE SESSION BANNER (IF ALREADY LOGGED IN) -->
-          <div v-if="currentUser" class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" :class="isHostUser ? 'border-top border-4 border-warning' : 'border-top border-4 border-primary'">
+          <div v-if="currentUser" class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden auth-card">
             <div class="card-body p-4 text-center">
               <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-xs" 
                    :class="isHostUser ? 'bg-dark text-warning' : 'bg-primary text-white'"
-                   style="width: 68px; height: 68px;">
-                <i v-if="isHostUser" class="bi bi-crown-fill fs-2 text-warning"></i>
-                <span v-else class="fs-2 fw-black">{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
+                   style="width: 60px; height: 60px;">
+                <i v-if="isHostUser" class="bi bi-crown-fill fs-3 text-warning"></i>
+                <span v-else class="fs-3 fw-bold">{{ (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase() }}</span>
               </div>
 
-              <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+              <div class="d-flex align-items-center justify-content-center gap-2 mb-1 flex-wrap">
                 <h5 class="fw-bold text-dark mb-0">{{ currentUser.displayName || 'Pengguna Aktif' }}</h5>
-                <span class="badge rounded-pill px-2.5 py-1 fw-bold" :class="isHostUser ? 'bg-dark text-warning border border-warning' : 'bg-primary-subtle text-primary border border-primary-subtle'">
-                  <i :class="isHostUser ? 'bi bi-crown-fill me-1' : 'bi bi-shield-check me-1'"></i>{{ isHostUser ? 'Host Project (Super Master)' : userRoleLabel }}
+                <span class="badge rounded-pill px-2.5 py-1 fw-semibold" :class="isHostUser ? 'bg-dark text-warning border border-warning' : 'bg-primary-subtle text-primary border border-primary-subtle'">
+                  <i :class="isHostUser ? 'bi bi-crown-fill me-1' : 'bi bi-shield-check me-1'"></i>{{ isHostUser ? 'Host Project' : userRoleLabel }}
                 </span>
               </div>
-              <div class="text-muted font-monospace small mb-3">{{ currentUser.email || 'arif_kafeinarts@kafeinarts.com' }}</div>
+              <div class="text-muted small mb-3">{{ currentUser.email || 'arif_kafeinarts@kafeinarts.com' }}</div>
 
               <div class="p-3 bg-light rounded-3 border mb-3 text-start small">
-                <div class="d-flex align-items-center justify-content-between text-muted mb-1">
+                <div class="d-flex align-items-center justify-content-between text-muted mb-1.5">
                   <span>Status Sesi:</span>
-                  <span class="badge bg-success-subtle text-success fw-bold">Terautentikasi & Siap</span>
+                  <span class="badge bg-success-subtle text-success fw-semibold">Terautentikasi</span>
                 </div>
-                <div class="d-flex align-items-center justify-content-between text-muted mb-1">
+                <div class="d-flex align-items-center justify-content-between text-muted mb-1.5">
                   <span>Hak Akses:</span>
-                  <span class="fw-semibold text-dark">{{ isHostUser ? '👑 Akses Penuh 100% + Buat Akun' : 'Sesuai Role (' + userRoleLabel + ')' }}</span>
+                  <span class="fw-medium text-dark">{{ isHostUser ? 'Akses Penuh (Host)' : userRoleLabel }}</span>
                 </div>
                 <div class="d-flex align-items-center justify-content-between text-muted">
                   <span>Departemen:</span>
-                  <span class="fw-semibold text-dark">{{ currentUser.department || (isHostUser ? 'Host & Workspace Owner' : 'Umum') }}</span>
+                  <span class="fw-medium text-dark">{{ currentUser.department || (isHostUser ? 'Host & Workspace Owner' : 'Umum') }}</span>
                 </div>
               </div>
 
-              <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                <button @click="goToDashboard" class="btn btn-primary rounded-pill px-4 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs flex-grow-1">
+              <div class="d-flex flex-column gap-2">
+                <button @click="goToDashboard" class="btn btn-primary rounded-3 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-xs w-100">
                   <i class="bi bi-grid-1x2-fill"></i>
-                  <span>Lanjutkan ke Dashboard Workspace</span>
+                  <span>Buka Dashboard Workspace</span>
                 </button>
-                <router-link to="/auth" class="btn btn-outline-secondary rounded-pill px-3 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-1.5">
-                  <i class="bi bi-gear-fill"></i>
-                  <span>Kelola Akun</span>
-                </router-link>
-                <button @click="handleLogout" class="btn btn-outline-danger rounded-pill px-3 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-1.5">
-                  <i class="bi bi-box-arrow-right"></i>
-                  <span>Ganti Akun</span>
-                </button>
+                <div class="d-flex gap-2">
+                  <router-link to="/auth" class="btn btn-outline-secondary rounded-3 py-2 fw-semibold d-flex align-items-center justify-content-center gap-1.5 flex-fill small">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Kelola Akun</span>
+                  </router-link>
+                  <button @click="handleLogout" class="btn btn-outline-danger rounded-3 py-2 fw-semibold d-flex align-items-center justify-content-center gap-1.5 flex-fill small">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Keluar Akun</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- NOT LOGGED IN / SWITCH ACCOUNT FORM CARD -->
-          <div v-else class="card border-0 shadow-sm rounded-4 overflow-hidden auth-card">
+          <!-- NOT LOGGED IN / AUTH FORM CARD -->
+          <div v-else class="card border-0 shadow-sm rounded-4 overflow-hidden auth-card bg-white">
             
-            <!-- CARD TABS NAVIGATION -->
-            <div class="card-header bg-white border-bottom p-0">
-              <ul class="nav nav-tabs nav-fill border-0 fw-bold small">
-                <!-- TAB 1: GERBANG HOST PROJECT (DEFAULT) -->
-                <li class="nav-item">
-                  <button 
-                    class="nav-link py-3 border-0 rounded-0 d-flex align-items-center justify-content-center gap-1.5 w-100" 
-                    :class="{ active: activeTab === 'host_gate', 'text-dark': activeTab === 'host_gate' }" 
-                    type="button" 
-                    @click="activeTab = 'host_gate'"
-                  >
-                    <i class="bi bi-crown-fill text-warning"></i>
-                    <span>👑 Gerbang Host Project</span>
-                  </button>
-                </li>
-                <!-- TAB 2: LOGIN AKUN TIM -->
-                <li class="nav-item">
-                  <button 
-                    class="nav-link py-3 border-0 rounded-0 d-flex align-items-center justify-content-center gap-1.5 w-100" 
-                    :class="{ active: activeTab === 'team_login', 'text-primary': activeTab === 'team_login' }" 
-                    type="button" 
-                    @click="activeTab = 'team_login'"
-                  >
-                    <i class="bi bi-box-arrow-in-right text-primary"></i>
-                    <span>Masuk Akun Tim</span>
-                  </button>
-                </li>
-                <!-- TAB 3: REGISTER BARU (LINK KE HALAMAN REGISTER) -->
-                <li class="nav-item">
-                  <router-link 
-                    to="/register" 
-                    class="nav-link py-3 border-0 rounded-0 d-flex align-items-center justify-content-center gap-1.5 w-100 text-success text-decoration-none"
-                  >
-                    <i class="bi bi-person-plus-fill text-success"></i>
-                    <span>Daftar Baru</span>
-                  </router-link>
-                </li>
-              </ul>
-            </div>
+            <div class="card-body p-3.5 p-sm-4 p-md-4">
 
-            <div class="card-body p-4 p-md-5">
+              <!-- MINIMALIST SEGMENTED TAB SWITCHER -->
+              <div class="segmented-control p-1 rounded-3 bg-light border d-flex mb-4">
+                <button 
+                  type="button" 
+                  class="btn segmented-btn flex-fill rounded-2 py-2 small fw-semibold transition-all"
+                  :class="activeTab === 'team_login' ? 'active-tab shadow-xs' : 'text-muted'"
+                  @click="activeTab = 'team_login'; alertMessage = ''"
+                >
+                  <i class="bi bi-box-arrow-in-right me-1.5"></i>
+                  <span>Masuk Akun</span>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn segmented-btn flex-fill rounded-2 py-2 small fw-semibold transition-all"
+                  :class="activeTab === 'register' ? 'active-tab shadow-xs' : 'text-muted'"
+                  @click="activeTab = 'register'; alertMessage = ''"
+                >
+                  <i class="bi bi-person-plus-fill me-1.5"></i>
+                  <span>Daftar Baru</span>
+                </button>
+              </div>
 
               <!-- ALERT FEEDBACK MESSAGE -->
-              <div v-if="alertMessage" class="alert d-flex align-items-center gap-2 py-2.5 px-3 rounded-3 mb-4 shadow-xs" :class="alertSuccess ? 'alert-success border-success-subtle' : 'alert-danger border-danger-subtle'">
-                <i :class="alertSuccess ? 'bi bi-check-circle-fill text-success fs-5' : 'bi bi-exclamation-triangle-fill text-danger fs-5'"></i>
-                <div class="small fw-semibold flex-grow-1">{{ alertMessage }}</div>
-                <button type="button" class="btn-close small" @click="alertMessage = ''"></button>
+              <div v-if="alertMessage" class="alert d-flex align-items-center gap-2 py-2.5 px-3 rounded-3 mb-3.5 shadow-xs border" :class="alertSuccess ? 'alert-success border-success-subtle' : 'alert-danger border-danger-subtle'">
+                <i :class="alertSuccess ? 'bi bi-check-circle-fill text-success fs-6' : 'bi bi-exclamation-circle-fill text-danger fs-6'"></i>
+                <div class="small fw-medium flex-grow-1">{{ alertMessage }}</div>
+                <button type="button" class="btn-close small" @click="alertMessage = ''" aria-label="Tutup"></button>
               </div>
 
               <!-- ========================================================
-                   TAB 1: GERBANG HOST PROJECT (arif_kafeinarts | admin123)
+                   TAB 1: LOGIN MANUAL AKUN TIM
                    ======================================================== -->
-              <div v-if="activeTab === 'host_gate'">
-                <!-- Highlight Banner -->
-                <div class="p-3 bg-dark text-white rounded-4 mb-4 border border-warning shadow-xs">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center fs-3 fw-black flex-shrink-0" style="width: 48px; height: 48px;">
-                      <i class="bi bi-crown-fill"></i>
-                    </div>
-                    <div>
-                      <div class="d-flex align-items-center gap-2">
-                        <h6 class="fw-black text-warning mb-0">Gerbang Otoritas Host Project</h6>
-                        <span class="badge bg-warning text-dark fw-bold" style="font-size: 10px;">Super Master</span>
-                      </div>
-                      <p class="text-white-50 small mb-0 mt-1">
-                        Kredensial khusus: <code>arif_kafeinarts</code> | <code>admin123</code>. Memiliki <strong>seluruh akses 100%</strong> dan hak penuh <strong>membuatkan akun</strong> pengguna tim.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <form @submit.prevent="handleHostLogin">
+              <div v-if="activeTab === 'team_login'">
+                <form @submit.prevent="handleEmailLogin" novalidate>
+                  
+                  <!-- Email / Username -->
                   <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Username Host <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-badge-fill text-warning"></i></span>
-                      <input 
-                        type="text" 
-                        v-model.trim="hostForm.username" 
-                        class="form-control border-start-0" 
-                        placeholder="arif_kafeinarts" 
-                        required 
-                        autocomplete="username"
-                      />
-                    </div>
-                    <div class="form-text small">Username Host: <code>arif_kafeinarts</code></div>
-                  </div>
-
-                  <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                      <label class="form-label fw-bold small text-dark mb-0">Password Host <span class="text-danger">*</span></label>
-                      <button type="button" @click="fillHostCredentials" class="btn btn-link btn-sm p-0 text-decoration-none small text-primary fw-bold">
-                        <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Isi Cepat (arif_kafeinarts | admin123)
-                      </button>
-                    </div>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-key-fill text-muted"></i></span>
-                      <input 
-                        :type="showPassword ? 'text' : 'password'" 
-                        v-model="hostForm.password" 
-                        class="form-control border-start-0 border-end-0" 
-                        placeholder="admin123" 
-                        required 
-                        autocomplete="current-password"
-                      />
-                      <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
-                        <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                      </button>
-                    </div>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    class="btn btn-dark text-warning border border-warning w-100 py-2.5 rounded-3 fw-black d-flex align-items-center justify-content-center gap-2 shadow-sm mb-3"
-                    :disabled="isLoading"
-                  >
-                    <span v-if="isLoading" class="spinner-border spinner-border-sm text-warning" role="status"></span>
-                    <i v-else class="bi bi-shield-check fs-5"></i>
-                    <span>{{ isLoading ? 'Memverifikasi Host Project...' : 'Buka Gerbang & Masuk sebagai Host Project' }}</span>
-                  </button>
-
-                  <div class="p-3 bg-light rounded-3 border small">
-                    <div class="fw-bold text-dark mb-1"><i class="bi bi-stars text-warning me-1"></i>Hak Akses Host Project:</div>
-                    <ul class="list-unstyled mb-0 text-muted ps-1">
-                      <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i><strong>Seluruh Akses 100%:</strong> Akses tanpa batas ke Keuangan, RAB, Invoice, Tugas & Drive.</li>
-                      <li><i class="bi bi-check2-circle text-success me-1"></i><strong>Pembuat Akun:</strong> Dapat membuatkan akun dan menentukan role untuk seluruh anggota tim atau klien.</li>
-                    </ul>
-                  </div>
-                </form>
-              </div>
-
-              <!-- ========================================================
-                   TAB 2: LOGIN AKUN TIM & KARYAWAN
-                   ======================================================== -->
-              <div v-else-if="activeTab === 'team_login'">
-                <!-- Google Quick Sign In -->
-                <div class="mb-4">
-                  <button 
-                    type="button" 
-                    @click="handleGoogleLogin" 
-                    :disabled="isLoading" 
-                    class="btn btn-light border w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs hover-scale"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>Masuk Cepat dengan Akun Google</span>
-                  </button>
-
-                  <div class="position-relative my-4 text-center">
-                    <hr class="border-secondary-subtle">
-                    <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">atau dengan email / username akun tim</span>
-                  </div>
-                </div>
-
-                <form @submit.prevent="handleEmailLogin">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Email atau Username Akun <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                    <label class="form-label text-secondary small fw-semibold mb-1">
+                      Email atau Username
+                    </label>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-envelope text-muted"></i>
+                      </span>
                       <input 
                         type="text" 
                         v-model.trim="loginForm.email" 
-                        class="form-control border-start-0" 
+                        class="form-control auth-input" 
                         placeholder="nama@kafeinarts.com atau username" 
                         required 
                         autocomplete="username"
@@ -245,157 +130,312 @@
                     </div>
                   </div>
 
+                  <!-- Password -->
                   <div class="mb-4">
-                    <label class="form-label fw-bold small text-dark">Kata Sandi <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label text-secondary small fw-semibold mb-0">
+                        Kata Sandi
+                      </label>
+                    </div>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-key text-muted"></i>
+                      </span>
                       <input 
                         :type="showPassword ? 'text' : 'password'" 
                         v-model="loginForm.password" 
-                        class="form-control border-start-0 border-end-0" 
+                        class="form-control auth-input pe-5" 
                         placeholder="Masukkan kata sandi" 
                         required 
                         autocomplete="current-password"
                       />
-                      <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
+                      <button 
+                        type="button" 
+                        class="btn-toggle-eye" 
+                        @click="showPassword = !showPassword"
+                        tabindex="-1"
+                        :title="showPassword ? 'Sembunyikan sandi' : 'Lihat sandi'"
+                      >
                         <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
                       </button>
                     </div>
                   </div>
 
+                  <!-- Tombol Masuk -->
                   <button 
                     type="submit" 
-                    class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs mb-3"
+                    class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-xs submit-btn"
                     :disabled="isLoading"
                   >
                     <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
                     <i v-else class="bi bi-box-arrow-in-right"></i>
-                    <span>{{ isLoading ? 'Sedang Masuk...' : 'Masuk ke Akun Tim' }}</span>
+                    <span>{{ isLoading ? 'Sedang Masuk...' : 'Masuk ke Akun' }}</span>
                   </button>
 
-                  <div class="position-relative my-3 text-center">
-                    <hr class="text-muted opacity-25" />
-                    <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">atau masuk dengan</span>
-                  </div>
-
-                  <button 
-                    type="button" 
-                    @click="handleGoogleLogin" 
-                    class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-xs mb-3"
-                    :disabled="isLoading"
-                  >
-                    <svg class="me-1" width="18" height="18" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>Masuk Cepat dengan Google</span>
-                  </button>
-
-                  <div class="text-center mt-3 pt-2 border-top">
+                  <div class="text-center mt-3.5 pt-3 border-top">
                     <span class="text-muted small">Belum memiliki akun tim? </span>
-                    <router-link to="/register" class="fw-bold text-primary text-decoration-none small">
-                      Daftar Akun Baru Sekarang <i class="bi bi-arrow-right"></i>
-                    </router-link>
+                    <button 
+                      type="button" 
+                      @click="activeTab = 'register'; alertMessage = ''" 
+                      class="btn btn-link p-0 fw-semibold text-primary text-decoration-none small align-baseline"
+                    >
+                      Daftar Baru di sini
+                    </button>
                   </div>
                 </form>
               </div>
 
               <!-- ========================================================
-                   TAB 3: DAFTAR AKUN BARU (REGISTER)
+                   TAB 2: DAFTAR AKUN BARU MANUAL (REGISTER)
                    ======================================================== -->
               <div v-else-if="activeTab === 'register'">
-                <form @submit.prevent="handleRegister">
+                <form @submit.prevent="handleRegister" novalidate>
+                  
+                  <!-- 1. NAMA LENGKAP -->
                   <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Nama Lengkap / Panggilan <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                    <label class="form-label text-secondary small fw-semibold mb-1">
+                      Nama Lengkap <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-person text-muted"></i>
+                      </span>
                       <input 
                         type="text" 
                         v-model.trim="registerForm.name" 
-                        class="form-control border-start-0" 
-                        placeholder="Contoh: Rian Designer" 
+                        class="form-control auth-input" 
+                        :class="{ 'is-invalid': regErrors.name }"
+                        placeholder="Contoh: Rian Anggara" 
+                        @input="clearRegError('name')"
                         required 
+                        autocomplete="name"
                       />
+                    </div>
+                    <div v-if="regErrors.name" class="text-danger small mt-1">
+                      <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.name }}
                     </div>
                   </div>
 
+                  <!-- 2. ALAMAT EMAIL -->
                   <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Alamat Email <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                    <label class="form-label text-secondary small fw-semibold mb-1">
+                      Alamat Email <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-envelope text-muted"></i>
+                      </span>
                       <input 
                         type="email" 
                         v-model.trim="registerForm.email" 
-                        class="form-control border-start-0" 
-                        placeholder="contoh@kafeinarts.com" 
+                        class="form-control auth-input" 
+                        :class="{ 'is-invalid': regErrors.email }"
+                        placeholder="nama@kafeinarts.com" 
+                        @input="clearRegError('email')"
                         required 
+                        autocomplete="email"
                       />
+                    </div>
+                    <div v-if="regErrors.email" class="text-danger small mt-1">
+                      <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.email }}
                     </div>
                   </div>
 
+                  <!-- 3. NO HANDPHONE (OPSIONAL) -->
                   <div class="mb-3">
-                    <label class="form-label fw-bold small text-dark">Kata Sandi (Minimal 6 karakter) <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label text-secondary small fw-semibold mb-0">
+                        No. WhatsApp / HP
+                      </label>
+                      <span class="text-muted" style="font-size: 11px;">Opsional</span>
+                    </div>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-telephone text-muted"></i>
+                      </span>
                       <input 
-                        :type="showPassword ? 'text' : 'password'" 
-                        v-model="registerForm.password" 
-                        class="form-control border-start-0 border-end-0" 
-                        placeholder="Buat kata sandi aman" 
-                        minlength="6"
-                        required 
+                        type="tel" 
+                        v-model.trim="registerForm.phone" 
+                        class="form-control auth-input" 
+                        :class="{ 'is-invalid': regErrors.phone }"
+                        placeholder="081234567890" 
+                        @input="clearRegError('phone')"
+                        autocomplete="tel"
                       />
-                      <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
-                        <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                      </button>
+                    </div>
+                    <div v-if="regErrors.phone" class="text-danger small mt-1">
+                      <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.phone }}
                     </div>
                   </div>
 
-                  <div class="row g-2 mb-4">
-                    <div class="col-sm-6">
-                      <label class="form-label fw-bold small text-dark">Pilih Role Akun <span class="text-danger">*</span></label>
-                      <select v-model="registerForm.role" class="form-select">
-                        <option v-for="r in availableRoles" :key="r.id" :value="r.id">
-                          {{ r.label }}
-                        </option>
+                  <!-- 4. KATA SANDI & KONFIRMASI (RESPONSIVE GRID) -->
+                  <div class="row g-2.5 mb-3">
+                    <!-- Kata Sandi -->
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label text-secondary small fw-semibold mb-1">
+                        Kata Sandi <span class="text-danger">*</span>
+                      </label>
+                      <div class="input-wrapper">
+                        <span class="input-icon">
+                          <i class="bi bi-key text-muted"></i>
+                        </span>
+                        <input 
+                          :type="showPassword ? 'text' : 'password'" 
+                          v-model="registerForm.password" 
+                          class="form-control auth-input pe-5" 
+                          :class="{ 'is-invalid': regErrors.password }"
+                          placeholder="Min. 6 digit" 
+                          minlength="6"
+                          @input="clearRegError('password'); checkPasswordMatch()"
+                          required 
+                          autocomplete="new-password"
+                        />
+                        <button 
+                          type="button" 
+                          class="btn-toggle-eye" 
+                          @click="showPassword = !showPassword" 
+                          tabindex="-1"
+                        >
+                          <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                        </button>
+                      </div>
+                      <div v-if="regErrors.password" class="text-danger small mt-1">
+                        <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.password }}
+                      </div>
+                    </div>
+
+                    <!-- Konfirmasi Kata Sandi -->
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label text-secondary small fw-semibold mb-1">
+                        Konfirmasi <span class="text-danger">*</span>
+                      </label>
+                      <div class="input-wrapper">
+                        <span class="input-icon">
+                          <i class="bi bi-shield-check text-muted"></i>
+                        </span>
+                        <input 
+                          :type="showConfirmPassword ? 'text' : 'password'" 
+                          v-model="registerForm.confirmPassword" 
+                          class="form-control auth-input pe-5" 
+                          :class="{ 'is-invalid': regErrors.confirmPassword }"
+                          placeholder="Ulangi sandi" 
+                          @input="clearRegError('confirmPassword'); checkPasswordMatch()"
+                          required 
+                          autocomplete="new-password"
+                        />
+                        <button 
+                          type="button" 
+                          class="btn-toggle-eye" 
+                          @click="showConfirmPassword = !showConfirmPassword" 
+                          tabindex="-1"
+                        >
+                          <i :class="showConfirmPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                        </button>
+                      </div>
+                      <div v-if="regErrors.confirmPassword" class="text-danger small mt-1">
+                        <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.confirmPassword }}
+                      </div>
+                    </div>
+
+                    <!-- Password Strength Bar -->
+                    <div v-if="registerForm.password" class="col-12 mt-1">
+                      <div class="progress" style="height: 3px;">
+                        <div 
+                          class="progress-bar transition-all" 
+                          :class="passwordStrength.class" 
+                          :style="{ width: `${passwordStrength.percent}%` }"
+                        ></div>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span class="text-muted" style="font-size: 10.5px;">Kekuatan sandi:</span>
+                        <span class="fw-semibold" :class="passwordStrength.textClass" style="font-size: 10.5px;">{{ passwordStrength.text }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 5. OPSI ROLE (CLEAN COMPACT SELECTOR) -->
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1.5">
+                      <label class="form-label text-secondary small fw-semibold mb-0">
+                        Pilih Role Akun <span class="text-danger">*</span>
+                      </label>
+                      <span class="text-muted" style="font-size: 11px;">
+                        {{ selectedRoleDescription }}
+                      </span>
+                    </div>
+
+                    <div class="row g-2">
+                      <div v-for="r in registerRoleOptions" :key="r.id" class="col-6 col-sm-4">
+                        <div 
+                          class="role-pill p-2 rounded-3 border text-center cursor-pointer transition-all d-flex align-items-center gap-2 justify-content-start"
+                          :class="registerForm.role === r.id ? 'active-role border-primary bg-primary-subtle text-primary' : 'bg-white text-secondary'"
+                          @click="registerForm.role = r.id; clearRegError('role')"
+                        >
+                          <i :class="r.icon" class="fs-6" :style="{ color: registerForm.role === r.id ? '#2563eb' : r.color }"></i>
+                          <div class="text-start overflow-hidden">
+                            <span class="fw-semibold d-block text-truncate" style="font-size: 11.5px;">{{ r.label }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="regErrors.role" class="text-danger small mt-1">
+                      <i class="bi bi-exclamation-circle-fill me-1"></i>{{ regErrors.role }}
+                    </div>
+                  </div>
+
+                  <!-- 6. DEPARTEMEN / DIVISI -->
+                  <div class="mb-4">
+                    <label class="form-label text-secondary small fw-semibold mb-1">
+                      Departemen / Divisi
+                    </label>
+                    <div class="input-wrapper">
+                      <span class="input-icon">
+                        <i class="bi bi-diagram-3 text-muted"></i>
+                      </span>
+                      <select v-model="registerForm.department" class="form-select auth-input">
+                        <option value="Kreatif & Desain">Kreatif & Desain</option>
+                        <option value="Video Editing & Motion">Video Editing & Motion</option>
+                        <option value="Keuangan & Pembukuan">Keuangan & Pembukuan</option>
+                        <option value="Manajemen Proyek & Operasional">Manajemen Proyek & Operasional</option>
+                        <option value="Marketing & Media Sosial">Marketing & Media Sosial</option>
+                        <option value="Teknologi & IT">Teknologi & IT</option>
+                        <option value="Umum">Divisi Umum</option>
                       </select>
                     </div>
-                    <div class="col-sm-6">
-                      <label class="form-label fw-bold small text-dark">Departemen / Divisi</label>
-                      <input 
-                        type="text" 
-                        v-model.trim="registerForm.department" 
-                        class="form-control" 
-                        placeholder="Contoh: Kreatif & Desain" 
-                      />
-                    </div>
                   </div>
 
+                  <!-- TOMBOL SUBMIT PENDAFTARAN -->
                   <button 
                     type="submit" 
-                    class="btn btn-success w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs"
+                    class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-xs submit-btn"
                     :disabled="isLoading"
                   >
                     <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
                     <i v-else class="bi bi-person-plus-fill"></i>
                     <span>{{ isLoading ? 'Mendaftarkan Akun...' : 'Daftar Akun Baru' }}</span>
                   </button>
+
+                  <div class="text-center mt-3.5 pt-3 border-top">
+                    <span class="text-muted small">Sudah memiliki akun tim? </span>
+                    <button 
+                      type="button" 
+                      @click="activeTab = 'team_login'; alertMessage = ''" 
+                      class="btn btn-link p-0 fw-semibold text-primary text-decoration-none small align-baseline"
+                    >
+                      Masuk ke Akun
+                    </button>
+                  </div>
                 </form>
               </div>
 
             </div>
 
-            <!-- CARD FOOTER: FAST DEMO GUIDE & WORKSPACE INFO -->
-            <div class="card-footer bg-light p-3 border-top d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 text-center text-sm-start">
-              <div class="small text-muted">
-                <i class="bi bi-info-circle me-1 text-primary"></i>
-                Host Utama: <code>arif_kafeinarts</code> | Sandi: <code>admin123</code>
-              </div>
-              <button @click="fillHostCredentials" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-3 py-1">
-                <i class="bi bi-lightning-charge-fill text-warning me-1"></i>Tes Host Cepat
-              </button>
+            <!-- CARD FOOTER: SECURITY BADGE -->
+            <div class="card-footer bg-light-subtle py-2.5 px-4 border-top text-center">
+              <span class="small text-muted d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                <i class="bi bi-shield-check text-success"></i>
+                <span>TaskArts Workspace &bull; Autentikasi terlindungi</span>
+              </span>
             </div>
 
           </div>
@@ -416,7 +456,6 @@ import {
   getHostSession,
   getUserSession,
   loginWithEmail,
-  loginWithGoogle,
   registerWithRole,
   logoutUser
 } from '../utils/firebase';
@@ -426,7 +465,7 @@ export default {
   name: 'LoginView',
   setup() {
     const router = useRouter();
-    const activeTab = ref('host_gate');
+    const activeTab = ref('team_login');
     const isLoading = ref(false);
     const showPassword = ref(false);
     const alertMessage = ref('');
@@ -447,14 +486,117 @@ export default {
       password: ''
     });
 
+    const showConfirmPassword = ref(false);
+    const regErrors = ref({});
+
     // Registration Form
     const registerForm = ref({
       name: '',
       email: '',
+      phone: '',
       password: '',
+      confirmPassword: '',
       role: 'member',
-      department: 'Teknologi & Desain'
+      department: 'Kreatif & Desain'
     });
+
+    const registerRoleOptions = [
+      { id: 'admin', label: 'Admin', icon: 'bi-shield-shaded', color: '#ef4444', badge: 'Akses Penuh', desc: 'Hak kelola seluruh workspace, anggota, role dan sistem' },
+      { id: 'manager', label: 'Project Manager', icon: 'bi-kanban-fill', color: '#8b5cf6', badge: 'Manajemen', desc: 'Kelola alur tugas, to-do, delegasi tim & progres proyek' },
+      { id: 'editor', label: 'Editor & Kreatif', icon: 'bi-camera-reels-fill', color: '#3b82f6', badge: 'Produksi', desc: 'Fokus produksi konten, aset desain, mood & Drive vault' },
+      { id: 'finance', label: 'Finance & Kas', icon: 'bi-wallet2', color: '#10b981', badge: 'Keuangan', desc: 'Kelola kas operasional, invoice & RAB proyek' },
+      { id: 'member', label: 'Member Tim', icon: 'bi-person-badge', color: '#6366f1', badge: 'Standar Tim', desc: 'Akses kalender, kolaborasi tugas harian & agenda tim' },
+      { id: 'client', label: 'Klien (Tinjauan)', icon: 'bi-eye-fill', color: '#64748b', badge: 'Tinjauan', desc: 'Tinjau perkembangan proyek dan status tagihan invoice' }
+    ];
+
+    const selectedRoleDescription = computed(() => {
+      const found = registerRoleOptions.find(r => r.id === registerForm.value.role);
+      return found ? `${found.label} — ${found.desc}` : 'Akses standar tim';
+    });
+
+    const isValidEmail = (email) => {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    };
+
+    const clearRegError = (field) => {
+      if (regErrors.value[field]) {
+        delete regErrors.value[field];
+      }
+    };
+
+    const checkPasswordMatch = () => {
+      if (registerForm.value.confirmPassword && registerForm.value.password !== registerForm.value.confirmPassword) {
+        regErrors.value.confirmPassword = 'Konfirmasi kata sandi belum cocok.';
+      } else if (registerForm.value.confirmPassword && registerForm.value.password === registerForm.value.confirmPassword) {
+        delete regErrors.value.confirmPassword;
+      }
+    };
+
+    const passwordStrength = computed(() => {
+      const p = registerForm.value.password || '';
+      if (!p) return { text: '', percent: 0, class: 'bg-secondary', textClass: 'text-muted' };
+      if (p.length < 6) return { text: 'Terlalu Pendek (min 6)', percent: 25, class: 'bg-danger', textClass: 'text-danger' };
+      const hasLetters = /[a-zA-Z]/.test(p);
+      const hasNumbers = /[0-9]/.test(p);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(p);
+      if (p.length >= 8 && hasLetters && hasNumbers && hasSpecial) {
+        return { text: 'Sangat Kuat', percent: 100, class: 'bg-success', textClass: 'text-success' };
+      }
+      if (p.length >= 6 && hasLetters && hasNumbers) {
+        return { text: 'Sedang / Cukup Kuat', percent: 70, class: 'bg-info', textClass: 'text-info' };
+      }
+      return { text: 'Standar (min 6)', percent: 45, class: 'bg-warning', textClass: 'text-warning' };
+    });
+
+    const validateRegisterForm = () => {
+      const errors = {};
+      
+      // 1. Nama Lengkap
+      if (!registerForm.value.name || !registerForm.value.name.trim()) {
+        errors.name = 'Nama lengkap wajib diisi.';
+      } else if (registerForm.value.name.trim().length < 2) {
+        errors.name = 'Nama lengkap minimal 2 karakter.';
+      }
+
+      // 2. Alamat Email
+      if (!registerForm.value.email || !registerForm.value.email.trim()) {
+        errors.email = 'Alamat email wajib diisi.';
+      } else if (!isValidEmail(registerForm.value.email.trim())) {
+        errors.email = 'Format email tidak valid (contoh: user@kafeinarts.com).';
+      }
+
+      // 3. No Handphone (Opsional)
+      if (registerForm.value.phone && registerForm.value.phone.trim()) {
+        const cleanPhone = registerForm.value.phone.trim().replace(/[\s-]/g, '');
+        const phoneRegex = /^(\+62|62|0)[0-9]{8,13}$/;
+        if (!phoneRegex.test(cleanPhone)) {
+          errors.phone = 'Format no handphone tidak valid (contoh: 081234567890).';
+        }
+      }
+
+      // 4. Kata Sandi
+      if (!registerForm.value.password) {
+        errors.password = 'Kata sandi wajib diisi.';
+      } else if (registerForm.value.password.length < 6) {
+        errors.password = 'Kata sandi minimal harus 6 karakter.';
+      }
+
+      // 5. Konfirmasi Kata Sandi
+      if (!registerForm.value.confirmPassword) {
+        errors.confirmPassword = 'Konfirmasi kata sandi wajib diisi.';
+      } else if (registerForm.value.confirmPassword !== registerForm.value.password) {
+        errors.confirmPassword = 'Konfirmasi kata sandi tidak cocok.';
+      }
+
+      // 6. Opsi Role
+      if (!registerForm.value.role) {
+        errors.role = 'Silakan pilih salah satu peran (role) akun.';
+      }
+
+      regErrors.value = errors;
+      return Object.keys(errors).length === 0;
+    };
 
     const isHostUser = computed(() => {
       if (!currentUser.value) return false;
@@ -543,45 +685,52 @@ export default {
       }
     };
 
-    const handleGoogleLogin = async () => {
-      isLoading.value = true;
-      alertMessage.value = '';
-      try {
-        const { profile, user } = await loginWithGoogle();
-        currentUser.value = profile || user;
-        alertSuccess.value = true;
-        alertMessage.value = 'Berhasil masuk dengan Google! Mengarahkan ke Dashboard...';
-        setTimeout(() => {
-          router.push('/home');
-        }, 200);
-      } catch (err) {
-        alertSuccess.value = false;
-        alertMessage.value = err.message || 'Gagal masuk dengan Google.';
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
     const handleRegister = async () => {
-      isLoading.value = true;
+      if (isLoading.value) return; // Prevent double clicks
       alertMessage.value = '';
+      if (!validateRegisterForm()) {
+        alertSuccess.value = false;
+        alertMessage.value = 'Mohon periksa kolom formulir pendaftaran yang ditandai merah.';
+        return;
+      }
+
+      isLoading.value = true;
       try {
         const { profile, user } = await registerWithRole(
           registerForm.value.email,
           registerForm.value.password,
           registerForm.value.name,
           registerForm.value.role,
-          registerForm.value.department
+          registerForm.value.department,
+          registerForm.value.phone
         );
         currentUser.value = profile || user;
         alertSuccess.value = true;
-        alertMessage.value = `Akun berhasil didaftarkan dengan role ${profile.role}! Mengarahkan ke Dashboard...`;
+        alertMessage.value = `Akun berhasil didaftarkan sebagai ${profile.role || 'Member'}! Mengarahkan ke Dashboard...`;
         setTimeout(() => {
           router.push('/home');
-        }, 200);
+        }, 300);
       } catch (err) {
         alertSuccess.value = false;
-        alertMessage.value = err.message || 'Gagal mendaftarkan akun baru.';
+        const errMsg = (err.message || '').toLowerCase();
+        if (err.code === 'auth/email-already-in-use' || errMsg.includes('sudah terdaftar') || errMsg.includes('already in use')) {
+          regErrors.value.email = 'Email ini sudah terdaftar. Silakan gunakan tab Masuk Akun Tim.';
+          alertMessage.value = 'Email sudah terdaftar di sistem. Silakan langsung login di tab Masuk.';
+        } else if (err.code === 'auth/invalid-email' || errMsg.includes('invalid-email')) {
+          regErrors.value.email = 'Format alamat email tidak valid.';
+          alertMessage.value = 'Format alamat email tidak valid.';
+        } else if (err.code === 'auth/weak-password' || errMsg.includes('weak-password')) {
+          regErrors.value.password = 'Kata sandi terlalu mudah ditebak. Gunakan kombinasi lebih aman.';
+          alertMessage.value = 'Kata sandi terlalu lemah (minimal 6 karakter).';
+        } else if (errMsg.includes('rate') || errMsg.includes('quota') || errMsg.includes('too-many-requests') || errMsg.includes('exceeded')) {
+          alertMessage.value = 'Server sedang sibuk. Pendaftaran tetap berhasil disimpan di mode aman lokal.';
+          alertSuccess.value = true;
+          setTimeout(() => {
+            router.push('/home');
+          }, 600);
+        } else {
+          alertMessage.value = err.message || 'Gagal mendaftarkan akun baru.';
+        }
       } finally {
         isLoading.value = false;
       }
@@ -611,20 +760,27 @@ export default {
       activeTab,
       isLoading,
       showPassword,
+      showConfirmPassword,
       alertMessage,
       alertSuccess,
       currentUser,
       isHostUser,
       userRoleLabel,
       availableRoles,
+      registerRoleOptions,
+      selectedRoleDescription,
       hostForm,
       loginForm,
       registerForm,
+      regErrors,
+      passwordStrength,
+      isValidEmail,
+      clearRegError,
+      checkPasswordMatch,
       fillHostCredentials,
       goToDashboard,
       handleHostLogin,
       handleEmailLogin,
-      handleGoogleLogin,
       handleRegister,
       handleLogout
     };
@@ -639,28 +795,154 @@ export default {
   align-items: center;
 }
 
+.brand-avatar {
+  background: #ffffff;
+  border-color: #e2e8f0 !important;
+}
+
 .auth-card {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.02) !important;
 }
 
-.nav-tabs .nav-link {
+/* Segmented Control Switcher */
+.segmented-control {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0 !important;
+}
+
+.segmented-btn {
+  border: 1px solid transparent;
   color: #64748b;
-  background-color: #f8fafc;
-  border-bottom: 2px solid transparent !important;
-  transition: all 0.2s ease;
+  font-size: 13px;
+  min-height: 38px;
 }
 
-.nav-tabs .nav-link.active {
+.segmented-btn:hover {
+  color: #1e293b;
+}
+
+.segmented-btn.active-tab {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Form Input Wrapper & Elements */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  z-index: 4;
+}
+
+.auth-input {
+  height: 44px;
+  padding-left: 36px !important;
+  font-size: 13.5px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
   background-color: #ffffff;
-  border-bottom: 2px solid #2563eb !important;
+  color: #0f172a;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.hover-scale {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.auth-input::placeholder {
+  color: #94a3b8;
+  font-size: 13px;
 }
 
-.hover-scale:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+.auth-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+
+.auth-input.is-invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.btn-toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-toggle-eye:hover {
+  color: #334155;
+}
+
+/* Compact Role Selection Pills */
+.role-pill {
+  min-height: 42px;
+  border-color: #e2e8f0 !important;
+  background-color: #ffffff;
+  user-select: none;
+}
+
+.role-pill:hover {
+  border-color: #cbd5e1 !important;
+  background-color: #f8fafc;
+}
+
+.role-pill.active-role {
+  border-color: #2563eb !important;
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+
+.submit-btn {
+  height: 44px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+/* Mobile fine-tuning */
+@media (max-width: 576px) {
+  .login-view-wrapper {
+    min-height: auto;
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .auth-card .card-body {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .auth-input {
+    height: 44px; /* Ensure 44px mobile touch target */
+    font-size: 14px; /* Prevents iOS auto-zoom on input focus */
+  }
+
+  .submit-btn {
+    height: 46px;
+  }
 }
 </style>

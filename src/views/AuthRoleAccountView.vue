@@ -54,22 +54,11 @@
               <li class="nav-item">
                 <a 
                   class="nav-link py-3 border-0 rounded-0 d-flex align-items-center justify-content-center gap-1.5" 
-                  :class="{ active: authTab === 'host_gate' }" 
-                  href="#" 
-                  @click.prevent="authTab = 'host_gate'"
-                >
-                  <i class="bi bi-crown-fill text-warning"></i>
-                  <span>👑 Gerbang Host Project</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a 
-                  class="nav-link py-3 border-0 rounded-0 d-flex align-items-center justify-content-center gap-1.5" 
                   :class="{ active: authTab === 'login' }" 
                   href="#" 
                   @click.prevent="authTab = 'login'"
                 >
-                  <i class="bi bi-box-arrow-in-right text-primary"></i>
+                  <i class="bi bi-box-arrow-in-right text-primary fs-6"></i>
                   <span>Masuk Akun Tim</span>
                 </a>
               </li>
@@ -80,7 +69,7 @@
                   href="#" 
                   @click.prevent="authTab = 'register'"
                 >
-                  <i class="bi bi-person-plus-fill text-success"></i>
+                  <i class="bi bi-person-plus-fill text-success fs-6"></i>
                   <span>Daftar Baru</span>
                 </a>
               </li>
@@ -88,110 +77,8 @@
           </div>
 
           <div class="card-body p-4 p-md-5">
-            <!-- TAB 1: GERBANG UTAMA HOST PROJECT (arif_kafeinarts | admin123) -->
-            <div v-if="authTab === 'host_gate'" class="mb-2">
-              <div class="p-3 bg-dark text-white rounded-4 mb-4 border border-warning-subtle shadow-xs">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="bg-warning text-dark rounded-circle p-2.5 d-flex align-items-center justify-content-center fs-4 fw-black flex-shrink-0" style="width: 48px; height: 48px;">
-                    <i class="bi bi-crown-fill"></i>
-                  </div>
-                  <div>
-                    <div class="d-flex align-items-center gap-2">
-                      <h6 class="fw-black text-warning mb-0">Gerbang Otoritas Host Project</h6>
-                      <span class="badge bg-warning text-dark fw-bold" style="font-size: 10px;">Super Master</span>
-                    </div>
-                    <small class="text-white-50 d-block mt-0.5">
-                      Kredensial khusus: <code>arif_kafeinarts</code> | <code>admin123</code>. Memiliki <strong>seluruh akses 100%</strong> dan wewenang penuh <strong>membuatkan akun</strong> bagi anggota tim.
-                    </small>
-                  </div>
-                </div>
-              </div>
-
-              <form @submit.prevent="handleHostLogin">
-                <div class="mb-3">
-                  <label class="form-label fw-bold small text-dark">Username Host <span class="text-danger">*</span></label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-badge-fill text-warning"></i></span>
-                    <input 
-                      type="text" 
-                      v-model.trim="hostForm.username" 
-                      class="form-control border-start-0" 
-                      placeholder="arif_kafeinarts" 
-                      required 
-                      autocomplete="username"
-                    />
-                  </div>
-                  <div class="form-text small">Username Host: <code>arif_kafeinarts</code></div>
-                </div>
-
-                <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <label class="form-label fw-bold small text-dark mb-0">Password Host <span class="text-danger">*</span></label>
-                    <button type="button" @click="fillHostCredentials" class="btn btn-link btn-sm p-0 text-decoration-none small text-primary fw-bold">
-                      <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Isi Cepat (arif_kafeinarts | admin123)
-                    </button>
-                  </div>
-                  <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key-fill text-muted"></i></span>
-                    <input 
-                      :type="showPassword ? 'text' : 'password'" 
-                      v-model="hostForm.password" 
-                      class="form-control border-start-0 border-end-0" 
-                      placeholder="admin123" 
-                      required 
-                      autocomplete="current-password"
-                    />
-                    <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
-                      <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <button 
-                  type="submit" 
-                  class="btn btn-dark text-warning border border-warning w-100 py-2.5 rounded-3 fw-black d-flex align-items-center justify-content-center gap-2 shadow-sm mb-3"
-                  :disabled="isLoading"
-                >
-                  <span v-if="isLoading" class="spinner-border spinner-border-sm text-warning" role="status"></span>
-                  <i v-else class="bi bi-shield-check fs-5"></i>
-                  <span>{{ isLoading ? 'Memverifikasi Host...' : 'Buka Gerbang & Masuk sebagai Host Project' }}</span>
-                </button>
-
-                <div class="p-3 bg-light rounded-3 border small">
-                  <div class="fw-bold text-dark mb-1"><i class="bi bi-stars text-warning me-1"></i>Hak Akses Host Project:</div>
-                  <ul class="list-unstyled mb-0 text-muted ps-1">
-                    <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i><strong>Seluruh Akses:</strong> Akses 100% penuh ke Keuangan, RAB, Invoice, Tugas & Drive.</li>
-                    <li><i class="bi bi-check2-circle text-success me-1"></i><strong>Pembuat Akun:</strong> Bisa membuatkan akun dan mengatur role untuk seluruh anggota tim atau klien.</li>
-                  </ul>
-                </div>
-              </form>
-            </div>
-
-            <!-- TAB 2: MASUK AKUN REGULER / TIM -->
-            <div v-else-if="authTab === 'login'">
-              <!-- Google Login Quick Option -->
-              <div class="mb-4">
-                <button 
-                  type="button" 
-                  @click="handleGoogleLogin" 
-                  :disabled="isLoading" 
-                  class="btn btn-light border w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs hover-scale"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                  </svg>
-                  <span>Masuk Cepat dengan Akun Google</span>
-                </button>
-
-                <div class="position-relative my-4 text-center">
-                  <hr class="border-secondary-subtle">
-                  <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">atau dengan email / username akun buatan host</span>
-                </div>
-              </div>
-
+            <!-- TAB 1: MASUK AKUN REGULER / TIM -->
+            <div v-if="authTab === 'login'">
               <!-- LOGIN FORM -->
               <form @submit.prevent="handleEmailLogin">
               <div class="mb-3">
@@ -273,22 +160,62 @@
                 </div>
               </div>
 
+              <!-- NO HANDPHONE (OPSIONAL) -->
               <div class="mb-3">
-                <label class="form-label fw-bold small text-dark">Kata Sandi (Password) <span class="text-danger">*</span></label>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label class="form-label fw-bold small text-dark mb-0">No. Handphone / WhatsApp</label>
+                  <span class="badge bg-secondary-subtle text-secondary small fw-normal" style="font-size: 11px;">Opsional</span>
+                </div>
                 <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
                   <input 
-                    :type="showPassword ? 'text' : 'password'" 
-                    v-model="registerForm.password" 
-                    class="form-control border-start-0 border-end-0" 
-                    placeholder="Minimal 6 karakter" 
-                    minlength="6"
-                    required 
-                    autocomplete="new-password"
+                    type="tel" 
+                    v-model.trim="registerForm.phone" 
+                    class="form-control border-start-0" 
+                    placeholder="Contoh: 081234567890 (Opsional)" 
+                    autocomplete="tel"
                   />
-                  <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
-                    <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
-                  </button>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold small text-dark">Kata Sandi <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                    <input 
+                      :type="showPassword ? 'text' : 'password'" 
+                      v-model="registerForm.password" 
+                      class="form-control border-start-0 border-end-0" 
+                      placeholder="Minimal 6 karakter" 
+                      minlength="6"
+                      required 
+                      autocomplete="new-password"
+                    />
+                    <button type="button" class="btn btn-outline-secondary border-start-0" @click="showPassword = !showPassword">
+                      <i :class="showPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-bold small text-dark">Konfirmasi Sandi <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-lock text-muted"></i></span>
+                    <input 
+                      :type="showPassword ? 'text' : 'password'" 
+                      v-model="registerForm.confirmPassword" 
+                      class="form-control border-start-0 border-end-0" 
+                      placeholder="Ulangi sandi" 
+                      minlength="6"
+                      required 
+                      autocomplete="new-password"
+                    />
+                    <span class="input-group-text bg-light border-start-0" v-if="registerForm.confirmPassword">
+                      <i v-if="registerForm.password === registerForm.confirmPassword" class="bi bi-check-circle-fill text-success"></i>
+                      <i v-else class="bi bi-x-circle-fill text-danger"></i>
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -748,7 +675,6 @@ import {
   USER_ROLES, 
   registerWithRole, 
   loginWithEmail, 
-  loginWithGoogle, 
   logoutUser, 
   updateUserRole,
   saveUserDataStore,
@@ -770,7 +696,7 @@ export default {
     const store = useStore();
     const currentUser = ref(auth.currentUser);
     const userProfile = ref(null);
-    const authTab = ref('host_gate');
+    const authTab = ref('login');
     const isLoading = ref(false);
     const showPassword = ref(false);
     const alertMessage = ref('');
@@ -811,7 +737,9 @@ export default {
     const registerForm = ref({
       name: '',
       email: '',
+      phone: '',
       password: '',
+      confirmPassword: '',
       role: 'member',
       department: 'Teknologi'
     });
@@ -1013,24 +941,38 @@ export default {
       }
     };
 
-    const handleGoogleLogin = async () => {
-      isLoading.value = true;
-      alertMessage.value = '';
-      try {
-        const { user, profile } = await loginWithGoogle();
-        currentUser.value = user;
-        userProfile.value = profile;
-        alertSuccess.value = true;
-        alertMessage.value = `Berhasil masuk dengan Google sebagai ${profile.displayName || user.email}!`;
-      } catch (err) {
-        alertSuccess.value = false;
-        alertMessage.value = `Gagal masuk dengan Google: ${err.message}`;
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
     const handleRegister = async () => {
+      if (!registerForm.value.name.trim()) {
+        alertSuccess.value = false;
+        alertMessage.value = 'Silakan masukkan nama lengkap.';
+        return;
+      }
+      if (!registerForm.value.email.trim()) {
+        alertSuccess.value = false;
+        alertMessage.value = 'Silakan masukkan alamat email yang valid.';
+        return;
+      }
+      if (registerForm.value.phone && registerForm.value.phone.trim()) {
+        const cleanPhone = registerForm.value.phone.trim().replace(/[\s-]/g, '');
+        const phoneRegex = /^(\+62|62|0)[0-9]{8,13}$/;
+        if (!phoneRegex.test(cleanPhone)) {
+          alertSuccess.value = false;
+          alertMessage.value = 'Format nomor handphone tidak valid (contoh: 081234567890).';
+          return;
+        }
+      }
+      if (registerForm.value.password.length < 6) {
+        alertSuccess.value = false;
+        alertMessage.value = 'Kata sandi minimal harus 6 karakter.';
+        return;
+      }
+      if (registerForm.value.confirmPassword && registerForm.value.password !== registerForm.value.confirmPassword) {
+        alertSuccess.value = false;
+        alertMessage.value = 'Konfirmasi kata sandi tidak cocok. Mohon periksa kembali.';
+        return;
+      }
+
+      if (isLoading.value) return;
       isLoading.value = true;
       alertMessage.value = '';
       try {
@@ -1039,7 +981,8 @@ export default {
           registerForm.value.password,
           registerForm.value.name,
           registerForm.value.role,
-          registerForm.value.department
+          registerForm.value.department,
+          registerForm.value.phone
         );
         currentUser.value = user;
         userProfile.value = profile;
@@ -1047,7 +990,15 @@ export default {
         alertMessage.value = `Pendaftaran berhasil! Akun Anda aktif dengan role: ${profile.role}.`;
       } catch (err) {
         alertSuccess.value = false;
-        alertMessage.value = `Pendaftaran gagal: ${err.message}`;
+        const errMsg = (err.message || '').toLowerCase();
+        if (err.code === 'auth/email-already-in-use' || errMsg.includes('sudah terdaftar') || errMsg.includes('already in use')) {
+          alertMessage.value = 'Email ini sudah terdaftar di sistem. Silakan langsung login di tab Masuk Akun.';
+        } else if (errMsg.includes('rate') || errMsg.includes('quota') || errMsg.includes('too-many-requests') || errMsg.includes('exceeded')) {
+          alertMessage.value = 'Server sedang sibuk. Pendaftaran tetap berhasil disimpan di sistem lokal.';
+          alertSuccess.value = true;
+        } else {
+          alertMessage.value = `Pendaftaran gagal: ${err.message}`;
+        }
       } finally {
         isLoading.value = false;
       }
@@ -1058,7 +1009,7 @@ export default {
         await logoutUser();
         currentUser.value = null;
         userProfile.value = null;
-        authTab.value = 'host_gate';
+        authTab.value = 'login';
         alertSuccess.value = true;
         alertMessage.value = 'Anda telah keluar dari sesi.';
       } catch (err) {
@@ -1174,7 +1125,6 @@ export default {
       handleDeleteCreatedAccount,
       handleUpdateCreatedAccountRole,
       handleEmailLogin,
-      handleGoogleLogin,
       handleRegister,
       handleLogout,
       handleUpdateRole,

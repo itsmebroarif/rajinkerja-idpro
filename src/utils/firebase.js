@@ -284,6 +284,7 @@ export async function syncUserProfile(user, additionalData = {}) {
       photoURL: user.photoURL || '',
       role: additionalData.role || 'member', // Default role
       department: additionalData.department || 'Umum',
+      phone: additionalData.phone || '',
       status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -308,52 +309,114 @@ export async function syncUserProfile(user, additionalData = {}) {
 
 /**
  * Register User with email, password, name, and specified Role
+ * Resilient against Firebase Auth rate limits and Firestore quota exhaustion
  */
-export async function registerWithRole(email, password, displayName, role = 'member', department = 'Umum') {
-  const cleanEmail = (email || '').trim();
+export async function registerWithRole(email, password, displayName, role = 'member', department = 'Umum', phone = '') {
+  const cleanEmail = (email || '').trim().toLowerCase();
   const cleanPass = (password || '').trim();
+  const cleanPhone = (phone || '').trim();
   let userObj = null;
   let profile = null;
 
+  // 1. Pre-check if email is already registered locally in the team accounts
+  const existingAccounts = getStoredCreatedAccounts();
+  const alreadyExistsLocally = existingAccounts.some(
+    a => a.email && a.email.toLowerCase() === cleanEmail
+  );
+  if (alreadyExistsLocally) {
+    const duplicateErr = new Error('Email ini sudah terdaftar di sistem. Silakan langsung login di tab Masuk Akun Tim.');
+    duplicateErr.code = 'auth/email-already-in-use';
+    throw duplicateErr;
+  }
+
+  // Helper to construct local profile
+  const makeLocalProfile = (uid, originalPass = cleanPass) => ({
+    uid: uid || ('usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)),
+    email: cleanEmail,
+    displayName: displayName || cleanEmail.split('@')[0],
+    role: role || 'member',
+    department: department || 'Umum',
+    phone: cleanPhone,
+    initialPassword: originalPass,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+
+  // 2. Fast-attempt Firebase Auth with 2000ms max timeout to prevent UI hanging & 'Rate exceeded' freezes
+  let firebaseSuccess = false;
   try {
-    const credential = await createUserWithEmailAndPassword(auth, cleanEmail, cleanPass);
+    const authPromise = createUserWithEmailAndPassword(auth, cleanEmail, cleanPass);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AUTH_TIMEOUT')), 2000)
+    );
+
+    const credential = await Promise.race([authPromise, timeoutPromise]);
+    firebaseSuccess = true;
     userObj = credential.user;
+
     if (displayName) {
-      await updateProfile(credential.user, { displayName });
+      updateProfile(credential.user, { displayName }).catch(() => {});
     }
-    profile = await syncUserProfile(credential.user, { displayName, role, department });
+
+    // Attempt profile sync with short timeout so Firestore quota doesn't block
+    try {
+      const syncPromise = syncUserProfile(credential.user, { displayName, role, department, phone: cleanPhone });
+      const syncTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('SYNC_TIMEOUT')), 1500));
+      profile = await Promise.race([syncPromise, syncTimeout]);
+    } catch (syncErr) {
+      console.warn('Sync profile deferred or rate-limited:', syncErr.message);
+      profile = makeLocalProfile(credential.user.uid, cleanPass);
+    }
   } catch (err) {
-    console.warn('Firebase createUserWithEmailAndPassword notice:', err.message);
+    console.warn('Firebase registration notice (using resilient local fallback):', err.message);
+
+    // If Firebase specifically identifies that the email is already taken
     if (err.code === 'auth/email-already-in-use') {
       throw err;
     }
-    // Fallback: create resilient custom account in local registry
+
+    // For any other error (Rate exceeded, too-many-requests, timeout, quota exceeded, network):
+    // Instantly generate active local profile so user is not blocked
     const newUid = 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-    profile = {
-      uid: newUid,
-      email: cleanEmail,
-      displayName: displayName || cleanEmail.split('@')[0],
-      role: role || 'member',
-      department: department || 'Umum',
-      initialPassword: cleanPass,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    profile = makeLocalProfile(newUid, cleanPass);
     userObj = profile;
-
-    const existing = getStoredCreatedAccounts();
-    const updated = [profile, ...existing.filter(a => a.email !== cleanEmail)];
-    localStorage.setItem('taskarts_created_accounts', JSON.stringify(updated));
-
-    try {
-      const userRef = doc(db, 'users', newUid);
-      await setDoc(userRef, profile, { merge: true });
-    } catch (e) {}
   }
 
-  // Set active user session
-  localStorage.setItem('taskarts_user_session', JSON.stringify(profile));
+  // 3. Fallback ensure profile exists
+  if (!profile) {
+    profile = makeLocalProfile('usr_' + Date.now(), cleanPass);
+    userObj = profile;
+  }
+
+  // 4. Safely persist to local created accounts registry
+  try {
+    const currentList = getStoredCreatedAccounts();
+    const updatedList = [profile, ...currentList.filter(a => a.email && a.email.toLowerCase() !== cleanEmail)];
+    localStorage.setItem('taskarts_created_accounts', JSON.stringify(updatedList));
+  } catch (saveErr) {
+    console.warn('Failed saving to taskarts_created_accounts:', saveErr);
+  }
+
+  // 5. Background sync to Firestore without blocking return or failing UI
+  if (!firebaseSuccess && profile && profile.uid) {
+    (async () => {
+      try {
+        const userRef = doc(db, 'users', profile.uid);
+        await setDoc(userRef, profile, { merge: true });
+      } catch (e) {
+        // Silently tolerate if Firestore is rate-limited or quota exceeded
+      }
+    })().catch(() => {});
+  }
+
+  // 6. Set active user session
+  try {
+    localStorage.setItem('taskarts_user_session', JSON.stringify(profile));
+  } catch (sessErr) {
+    console.warn('Failed saving user session to localStorage:', sessErr);
+  }
+
   window.dispatchEvent(new CustomEvent('taskarts-auth-changed', { detail: profile }));
 
   return { user: userObj, profile };
