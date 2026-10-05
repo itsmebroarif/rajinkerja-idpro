@@ -33,7 +33,7 @@
     <div
       ref="canvasContainer"
       class="w-100 position-relative"
-      style="height: clamp(340px, 58vh, 480px); cursor: e-resize;"
+      style="height: 480px; cursor: e-resize;"
       @mousemove="onMouseMove"
       @touchmove.prevent="onTouchMove"
     ></div>

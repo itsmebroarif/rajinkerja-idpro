@@ -337,56 +337,56 @@
       <div class="card-body p-3">
         <!-- View Mode Navigation Tabs -->
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3 pb-3 border-bottom">
-          <div class="todo-view-mode-bar d-flex flex-wrap gap-1.5 overflow-x-auto pb-1" role="group">
+          <div class="btn-group flex-wrap" role="group">
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'list' }"
               @click="currentViewMode = 'list'"
             >
-              <i class="bi bi-list-ul me-1.5"></i> <span>1. Standard List</span>
+              <i class="bi bi-list-ul me-1"></i> 1. Standard List
             </button>
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'kanban' }"
               @click="currentViewMode = 'kanban'"
             >
-              <i class="bi bi-kanban me-1.5"></i> <span>2. Kanban Board</span>
+              <i class="bi bi-kanban me-1"></i> 2. Kanban Board
             </button>
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'eisenhower' }"
               @click="currentViewMode = 'eisenhower'"
             >
-              <i class="bi bi-grid-fill me-1.5"></i> <span>3. Matriks Eisenhower</span>
+              <i class="bi bi-grid-fill me-1"></i> 3. Matriks Eisenhower
             </button>
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'timeline' }"
               @click="currentViewMode = 'timeline'"
             >
-              <i class="bi bi-calendar-range me-1.5"></i> <span>4. Timeline Deadline</span>
+              <i class="bi bi-calendar-range me-1"></i> 4. Timeline Deadline
             </button>
 
-            <!-- VIEW MODE 5: FOLDER & CATEGORY GROUP -->
+            <!-- NEW VIEW MODE 5: FOLDER & CATEGORY GROUP -->
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'folder' }"
               @click="currentViewMode = 'folder'"
             >
-              <i class="bi bi-folder-fill me-1.5"></i> <span>5. Kelompok Folder</span>
+              <i class="bi bi-folder-fill me-1"></i> 5. Kelompok Folder
             </button>
 
             <button
-              class="todo-view-tab-btn"
+              class="btn btn-outline-primary px-3 py-2 fw-semibold"
               :class="{ active: currentViewMode === 'compact' }"
               @click="currentViewMode = 'compact'"
             >
-              <i class="bi bi-check-square me-1.5"></i> <span>6. Checklist Ringkas</span>
+              <i class="bi bi-check-square me-1"></i> 6. Checklist Ringkas
             </button>
           </div>
 
           <!-- Search Box -->
-          <div class="input-group todo-search-box">
+          <div class="input-group" style="max-width: 260px;">
             <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
             <input type="text" class="form-control bg-light border-start-0" placeholder="Cari task / tag..." v-model="searchQuery" />
           </div>
@@ -1660,96 +1660,5 @@ export default {
 .style-scroll-horizontal::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
-}
-
-/* Modern View Mode Switcher Pill Tabs */
-.todo-view-mode-bar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.todo-view-mode-bar::-webkit-scrollbar {
-  display: none;
-}
-
-.todo-view-tab-btn {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  padding: 8px 16px;
-  font-size: 13.5px;
-  font-weight: 600;
-  border-radius: 9999px;
-  border: 1px solid var(--border-color, #e2e8f0);
-  background-color: var(--bg-surface, #f8fafc);
-  color: var(--text-main, #334155);
-  cursor: pointer;
-  transition: all 0.18s cubic-bezier(0.2, 0, 0, 1);
-  user-select: none;
-  text-decoration: none;
-}
-
-.todo-view-tab-btn i {
-  color: var(--primary-color, #2563eb);
-  transition: color 0.18s ease;
-}
-
-.todo-view-tab-btn:hover {
-  background-color: var(--sidebar-hover-bg, #f1f5f9);
-  border-color: var(--primary-color, #2563eb);
-  color: var(--primary-color, #2563eb);
-}
-
-.todo-view-tab-btn.active,
-.todo-view-tab-btn.active:hover,
-.todo-view-tab-btn.active:focus,
-.todo-view-tab-btn.active:active {
-  background-color: var(--primary-color, #2563eb) !important;
-  border-color: var(--primary-color, #2563eb) !important;
-  color: #ffffff !important;
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.32);
-}
-
-.todo-view-tab-btn.active *,
-.todo-view-tab-btn.active i,
-.todo-view-tab-btn.active span {
-  color: #ffffff !important;
-}
-
-:global(.dark-mode) .todo-view-tab-btn,
-:global(.dark-theme) .todo-view-tab-btn {
-  background-color: var(--bg-surface, #1e293b);
-  border-color: var(--border-color, #334155);
-  color: var(--text-main, #f8fafc);
-}
-
-:global(.oled-theme) .todo-view-tab-btn {
-  background-color: #0d0d0d;
-  border-color: #27272a;
-  color: #f8fafc;
-}
-
-:global(.dark-mode) .todo-view-tab-btn.active,
-:global(.dark-theme) .todo-view-tab-btn.active,
-:global(.oled-theme) .todo-view-tab-btn.active {
-  background-color: var(--primary-color, #2563eb) !important;
-  border-color: var(--primary-color, #2563eb) !important;
-  color: #ffffff !important;
-}
-
-:global(.dark-mode) .todo-view-tab-btn.active *,
-:global(.dark-theme) .todo-view-tab-btn.active *,
-:global(.oled-theme) .todo-view-tab-btn.active * {
-  color: #ffffff !important;
-}
-
-.todo-search-box {
-  max-width: 260px;
-}
-
-@media (max-width: 768px) {
-  .todo-search-box {
-    max-width: 100%;
-    width: 100%;
-  }
 }
 </style>

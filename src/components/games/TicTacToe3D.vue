@@ -25,7 +25,7 @@
     </div>
 
     <!-- 3D Canvas -->
-    <div ref="canvasContainer" class="w-100 position-relative" style="height: clamp(340px, 58vh, 480px); cursor: pointer;" @click="onCanvasClick"></div>
+    <div ref="canvasContainer" class="w-100 position-relative" style="height: 480px; cursor: pointer;" @click="onCanvasClick"></div>
 
     <!-- Instructions Banner -->
     <div class="position-absolute bottom-0 start-0 end-0 p-3 bg-dark bg-opacity-75 text-center text-white-50 border-top border-secondary border-opacity-25 z-3 small">

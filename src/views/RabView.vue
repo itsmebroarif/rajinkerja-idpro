@@ -196,17 +196,17 @@
 
           <div class="col-6 col-md-3">
             <label class="form-label fw-semibold">Jumlah (Qty) <span class="text-danger">*</span></label>
-            <input type="number" min="1" class="form-control" v-model.number="rabForm.qty" placeholder="Contoh: 1" required />
+            <input type="number" min="1" class="form-control" v-model.number="rabForm.qty" required />
           </div>
 
           <div class="col-6 col-md-3">
             <label class="form-label fw-semibold">Satuan <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" v-model="rabForm.satuan" placeholder="Contoh: pcs / unit / paket" required />
+            <input type="text" class="form-control" v-model="rabForm.satuan" placeholder="pcs / unit / porsi / paket" required />
           </div>
 
           <div class="col-12 col-md-3">
             <label class="form-label fw-semibold">Harga Satuan (Rp) <span class="text-danger">*</span></label>
-            <input type="number" min="0" class="form-control font-monospace fw-semibold" v-model.number="rabForm.harga_satuan" placeholder="Contoh: 150000" required />
+            <input type="number" min="0" class="form-control font-monospace fw-semibold" v-model.number="rabForm.harga_satuan" placeholder="0" required />
           </div>
 
           <div class="col-12 col-md-3">
@@ -218,7 +218,7 @@
 
           <div class="col-12 col-md-6">
             <label class="form-label fw-semibold">Income / Dana Alokasi Item (Rp)</label>
-            <input type="number" min="0" class="form-control font-monospace text-success fw-semibold" v-model.number="rabForm.income" placeholder="Contoh: 5000000 (opsional)" />
+            <input type="number" min="0" class="form-control font-monospace text-success fw-semibold" v-model.number="rabForm.income" placeholder="0 jika belum ada" />
           </div>
 
           <div class="col-12 col-md-6">
@@ -250,13 +250,13 @@
             <label class="form-label fw-semibold">Nominal Pemasukan (Rp) <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text bg-light fw-bold">Rp</span>
-              <input type="number" min="1" class="form-control fw-bold fs-5 text-success font-monospace" v-model.number="incomeForm.nominal" placeholder="Contoh: 10000000" required />
+              <input type="number" min="1" class="form-control fw-bold fs-5 text-success font-monospace" v-model.number="incomeForm.nominal" placeholder="0" required />
             </div>
           </div>
 
           <div class="col-12">
             <label class="form-label fw-semibold">Keterangan Catatan</label>
-            <textarea class="form-control" rows="2" v-model="incomeForm.keterangan" placeholder="Contoh: Kuitansi #102 / Bukti transfer donatur"></textarea>
+            <textarea class="form-control" rows="2" v-model="incomeForm.keterangan" placeholder="Kuitansi #102 / Bukti transfer donatur"></textarea>
           </div>
 
           <div class="col-12 text-end pt-3 border-top">
@@ -286,12 +286,12 @@
 
           <div class="col-6 col-md-4">
             <label class="form-label fw-semibold">Jumlah (Qty) <span class="text-danger">*</span></label>
-            <input type="number" min="1" class="form-control" v-model.number="expenseForm.qty" placeholder="Contoh: 1" required />
+            <input type="number" min="1" class="form-control" v-model.number="expenseForm.qty" required />
           </div>
 
           <div class="col-6 col-md-4">
             <label class="form-label fw-semibold">Harga Satuan (Rp) <span class="text-danger">*</span></label>
-            <input type="number" min="0" class="form-control font-monospace" v-model.number="expenseForm.harga_satuan" placeholder="Contoh: 75000" required />
+            <input type="number" min="0" class="form-control font-monospace" v-model.number="expenseForm.harga_satuan" required />
           </div>
 
           <div class="col-12 col-md-4">
@@ -863,10 +863,10 @@ export default {
 
     const rabForm = ref({
       nama_item: '',
-      qty: null,
-      satuan: '',
-      income: null,
-      harga_satuan: null,
+      qty: 1,
+      satuan: 'pcs',
+      income: 0,
+      harga_satuan: 0,
       tanggal: new Date().toISOString().split('T')[0],
       status: 'Rencana',
       catatan: ''
@@ -875,15 +875,15 @@ export default {
     const incomeForm = ref({
       sumber_dana: '',
       tanggal: new Date().toISOString().split('T')[0],
-      nominal: null,
+      nominal: 0,
       keterangan: ''
     });
 
     const expenseForm = ref({
       rab_item_id: null,
       deskripsi: '',
-      qty: null,
-      harga_satuan: null,
+      qty: 1,
+      harga_satuan: 0,
       tanggal: new Date().toISOString().split('T')[0],
       keterangan: ''
     });
@@ -912,18 +912,18 @@ export default {
       if (type === 'rab') {
         rabForm.value = {
           nama_item: '',
-          qty: null,
-          satuan: '',
-          income: null,
-          harga_satuan: null,
+          qty: 1,
+          satuan: 'pcs',
+          income: 0,
+          harga_satuan: 0,
           tanggal: new Date().toISOString().split('T')[0],
           status: 'Rencana',
           catatan: ''
         };
       } else if (type === 'income') {
-        incomeForm.value = { sumber_dana: '', tanggal: new Date().toISOString().split('T')[0], nominal: null, keterangan: '' };
+        incomeForm.value = { sumber_dana: '', tanggal: new Date().toISOString().split('T')[0], nominal: 0, keterangan: '' };
       } else if (type === 'expense') {
-        expenseForm.value = { rab_item_id: null, deskripsi: '', qty: null, harga_satuan: null, tanggal: new Date().toISOString().split('T')[0], keterangan: '' };
+        expenseForm.value = { rab_item_id: null, deskripsi: '', qty: 1, harga_satuan: 0, tanggal: new Date().toISOString().split('T')[0], keterangan: '' };
       }
       showForm.value = true;
       nextTick(() => {

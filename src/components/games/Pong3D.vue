@@ -28,7 +28,7 @@
     <div
       ref="canvasContainer"
       class="w-100 position-relative"
-      style="height: clamp(340px, 58vh, 480px); cursor: ns-resize;"
+      style="height: 480px; cursor: ns-resize;"
       @mousemove="onMouseMove"
       @touchmove.prevent="onTouchMove"
     ></div>

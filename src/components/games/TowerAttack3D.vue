@@ -31,7 +31,7 @@
     </div>
 
     <!-- 3D Canvas Area -->
-    <div ref="canvasContainer" class="w-100 position-relative" style="height: clamp(340px, 58vh, 520px); cursor: pointer;" @click="onCanvasClick"></div>
+    <div ref="canvasContainer" class="w-100 position-relative" style="height: 520px; cursor: pointer;" @click="onCanvasClick"></div>
 
     <!-- Action Skills Bar & Upgrades (Bottom overlay during play) -->
     <div v-if="isPlaying && !isGameOver" class="position-absolute bottom-0 start-0 end-0 p-3 bg-dark bg-opacity-80 backdrop-blur border-top border-secondary border-opacity-25 z-3">
@@ -460,7 +460,7 @@ export default {
       if (!canvasContainer.value) return;
 
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 480;
+      const height = 520;
 
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0f172a); // Midnight sky
@@ -471,7 +471,6 @@ export default {
       camera.lookAt(8, 2, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -529,7 +528,7 @@ export default {
     const handleResize = () => {
       if (!canvasContainer.value || !renderer || !camera) return;
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 480;
+      const height = 520;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);

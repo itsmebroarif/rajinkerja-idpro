@@ -37,7 +37,7 @@
     </div>
 
     <!-- Active Customer Order Floating Card -->
-    <div v-if="isPlaying && !isGameOver && currentOrder" class="position-absolute top-16 start-50 translate-middle-x z-3 bg-white text-dark rounded-4 shadow-lg p-3 border-2 border-warning" style="top: 70px; min-width: 270px; max-width: 94%;">
+    <div v-if="isPlaying && !isGameOver && currentOrder" class="position-absolute top-16 start-50 translate-middle-x z-3 bg-white text-dark rounded-4 shadow-lg p-3 border-2 border-warning" style="top: 80px; min-width: 320px; max-width: 90%;">
       <div class="d-flex justify-content-between align-items-center mb-1">
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4">{{ currentOrder.avatar }}</span>
@@ -74,7 +74,7 @@
     </div>
 
     <!-- 3D Canvas Area -->
-    <div ref="canvasContainer" class="w-100 position-relative" style="height: clamp(340px, 55vh, 520px);"></div>
+    <div ref="canvasContainer" class="w-100 position-relative" style="height: 520px;"></div>
 
     <!-- Warkop Barista Kitchen Prep Table (Bottom Overlay) -->
     <div v-if="isPlaying && !isGameOver" class="position-absolute bottom-0 start-0 end-0 p-3 bg-dark bg-opacity-90 backdrop-blur border-top border-secondary border-opacity-30 z-3">
@@ -387,7 +387,7 @@ export default {
       if (!canvasContainer.value) return;
 
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 450;
+      const height = 520;
 
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x18181b); // Warm cozy night ambiance
@@ -397,7 +397,6 @@ export default {
       camera.lookAt(0, 1.6, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;
 
@@ -421,7 +420,7 @@ export default {
     const handleResize = () => {
       if (!canvasContainer.value || !renderer || !camera) return;
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 450;
+      const height = 520;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);

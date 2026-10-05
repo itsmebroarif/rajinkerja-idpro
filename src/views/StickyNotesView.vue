@@ -62,16 +62,16 @@
         </router-link>
       </div>
 
-      <!-- SEARCH & FILTER & VIEW LAYOUT BAR -->
+      <!-- SEARCH & FILTER BAR -->
       <div class="bg-white p-3 rounded-4 shadow-sm border mb-4">
         <div class="row g-3 align-items-center">
-          <div class="col-lg-4 col-md-5">
+          <div class="col-md-5">
             <div class="input-group">
               <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
               <input
                 type="text"
                 class="form-control bg-light border-start-0 ps-0"
-                placeholder="Cari judul, kata kunci, gambar..."
+                placeholder="Cari judul, kata kunci, gambar, atau diagram..."
                 v-model="searchQuery"
               />
               <button v-if="searchQuery" class="btn btn-light border" @click="searchQuery = ''">
@@ -80,10 +80,10 @@
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-7 d-flex align-items-center gap-1.5 overflow-auto">
-            <span class="small fw-semibold text-muted d-none d-sm-inline">Warna:</span>
+          <div class="col-md-7 d-flex align-items-center justify-content-md-end gap-2 overflow-auto">
+            <span class="small fw-semibold text-muted d-none d-sm-inline">Filter Warna:</span>
             <button
-              class="btn btn-sm rounded-pill px-2.5"
+              class="btn btn-sm rounded-pill px-3"
               :class="selectedColor === 'all' ? 'btn-dark' : 'btn-light border'"
               @click="selectedColor = 'all'"
             >
@@ -92,80 +92,18 @@
             <button
               v-for="c in colorOptions"
               :key="c.code"
-              class="btn btn-sm rounded-pill px-2 d-flex align-items-center justify-content-center"
+              class="btn btn-sm rounded-pill px-2.5 d-flex align-items-center justify-content-center"
               :class="selectedColor === c.code ? 'border-2 border-dark shadow-sm' : 'border'"
               :style="{ backgroundColor: c.code, color: '#000' }"
               :title="c.name"
               :aria-label="c.name"
               @click="selectedColor = c.code"
             >
-              <span class="badge bg-white text-dark rounded-pill px-1.5 py-0.5 fw-bold" style="font-size: 10px;">
+              <span class="badge bg-white text-dark rounded-pill px-2 py-0.5 fw-bold" style="font-size: 11px;">
                 {{ getNotesCountByColor(c.code) }}
               </span>
             </button>
           </div>
-
-          <!-- View Layout Switcher (Grid / List / Kanban) -->
-          <div class="col-lg-4 d-flex align-items-center justify-content-lg-end gap-2">
-            <div class="btn-group p-1 bg-light rounded-pill border shadow-2xs" role="group">
-              <button
-                type="button"
-                class="btn btn-sm rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1.5 transition-all"
-                :class="viewLayout === 'grid' ? 'btn-primary text-white shadow-sm' : 'btn-light text-muted border-0'"
-                @click="setViewLayout('grid')"
-                title="Tampilan Grid Kartu"
-              >
-                <i class="bi bi-grid-fill"></i>
-                <span class="small">Grid</span>
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1.5 transition-all"
-                :class="viewLayout === 'list' ? 'btn-primary text-white shadow-sm' : 'btn-light text-muted border-0'"
-                @click="setViewLayout('list')"
-                title="Tampilan List Daftar"
-              >
-                <i class="bi bi-list-task"></i>
-                <span class="small">List</span>
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1.5 transition-all"
-                :class="viewLayout === 'kanban' ? 'btn-primary text-white shadow-sm' : 'btn-light text-muted border-0'"
-                @click="setViewLayout('kanban')"
-                title="Tampilan Papan Kanban Kolom"
-              >
-                <i class="bi bi-kanban"></i>
-                <span class="small">Kanban</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Kanban Grouping Toolbar -->
-        <div v-if="viewLayout === 'kanban'" class="mt-3 pt-2.5 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <div class="d-flex align-items-center gap-2">
-            <span class="small fw-bold text-dark"><i class="bi bi-diagram-3 text-primary me-1"></i>Grup Kolom Kanban:</span>
-            <div class="btn-group btn-group-sm">
-              <button
-                type="button"
-                class="btn btn-xs rounded-pill px-3 py-1"
-                :class="kanbanGroupBy === 'status' ? 'btn-dark fw-bold' : 'btn-outline-secondary bg-white'"
-                @click="setKanbanGroupBy('status')"
-              >
-                <i class="bi bi-check2-circle me-1"></i> Status Alur Kerja
-              </button>
-              <button
-                type="button"
-                class="btn btn-xs rounded-pill px-3 py-1"
-                :class="kanbanGroupBy === 'color' ? 'btn-dark fw-bold' : 'btn-outline-secondary bg-white'"
-                @click="setKanbanGroupBy('color')"
-              >
-                <i class="bi bi-palette me-1"></i> Warna Catatan
-              </button>
-            </div>
-          </div>
-          <small class="text-muted d-none d-md-inline"><i class="bi bi-info-circle me-1"></i>Drag & drop kartu atau gunakan menu pindah untuk memindahkan note antar kolom.</small>
         </div>
 
         <!-- Bulk Selection Toolbar -->
@@ -179,8 +117,8 @@
         </div>
       </div>
 
-      <!-- 1. NOTES GRID VIEW -->
-      <div class="row g-4" v-if="filteredNotes.length > 0 && viewLayout === 'grid'">
+      <!-- NOTES GRID -->
+      <div class="row g-4" v-if="filteredNotes.length > 0">
         <div v-for="note in filteredNotes" :key="note.id" class="col-md-6 col-lg-4">
           <div class="card border-0 shadow-sm rounded-4 h-100 p-4 hover-card position-relative sticky-note-card" :style="{ '--note-accent': note.color || '#fef08a' }">
             <div class="note-color-stripe" :style="{ backgroundColor: note.color || '#fef08a' }"></div>
@@ -208,11 +146,8 @@
               </div>
             </div>
 
-            <!-- Badges for special content (Status / Mermaid / Images) -->
-            <div class="d-flex gap-1.5 mb-2 flex-wrap">
-              <span class="badge rounded-pill px-2 py-0.5 small" :class="getStatusBadgeClass(note.status)">
-                {{ getStatusLabel(note.status) }}
-              </span>
+            <!-- Badges for special content (Mermaid / Images) -->
+            <div class="d-flex gap-1.5 mb-2 flex-wrap" v-if="hasMermaid(note.content) || hasImages(note.content)">
               <span v-if="hasMermaid(note.content)" class="badge bg-indigo-subtle text-indigo px-2 py-0.5 rounded-pill font-monospace" style="font-size: 10px;">
                 <i class="bi bi-diagram-3 me-1"></i> Flowchart
               </span>
@@ -233,184 +168,6 @@
               <router-link :to="'/notes/' + note.id" class="btn btn-xs btn-preview-badge rounded-pill px-3 py-1 fw-semibold text-decoration-none">
                 <i class="bi bi-eye me-1"></i> Buka Detail
               </router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. NOTES LIST VIEW -->
-      <div v-else-if="filteredNotes.length > 0 && viewLayout === 'list'" class="d-flex flex-column gap-2.5">
-        <div
-          v-for="note in filteredNotes"
-          :key="note.id"
-          class="card border-0 shadow-sm rounded-4 p-3 hover-card position-relative note-list-row bg-white"
-          :style="{ borderLeft: `6px solid ${note.color || '#fef08a'} !important` }"
-        >
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <!-- Left: Checkbox + Title + Status + Badges -->
-            <div class="d-flex align-items-center gap-2.5 flex-grow-1 overflow-hidden me-2" style="min-width: 260px;">
-              <input type="checkbox" class="form-check-input mt-0 cursor-pointer" :value="note.id" v-model="selectedIds" />
-              <div class="overflow-hidden">
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                  <router-link :to="'/notes/' + note.id" class="text-decoration-none">
-                    <h6 class="fw-bold mb-0 text-truncate text-dark hover-title note-card-title">{{ note.title || 'Untitled Note' }}</h6>
-                  </router-link>
-                  <!-- Status Pill -->
-                  <span class="badge rounded-pill px-2 py-0.5 small" :class="getStatusBadgeClass(note.status)">
-                    {{ getStatusLabel(note.status) }}
-                  </span>
-                  <!-- Special Badges -->
-                  <span v-if="hasMermaid(note.content)" class="badge bg-indigo-subtle text-indigo px-2 py-0.5 rounded-pill font-monospace" style="font-size: 10px;">
-                    <i class="bi bi-diagram-3 me-1"></i> Flowchart
-                  </span>
-                  <span v-if="hasImages(note.content)" class="badge bg-info-subtle text-info-emphasis px-2 py-0.5 rounded-pill font-monospace" style="font-size: 10px;">
-                    <i class="bi bi-image me-1"></i> Image
-                  </span>
-                </div>
-                <!-- Excerpt inline -->
-                <p class="small text-muted mb-0 text-truncate mt-1" style="max-width: 650px;">
-                  {{ cleanPlainTextExcerpt(note.content) || 'Tidak ada konten teks tambahan...' }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Right: Timestamp & Action Buttons -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-              <span class="small text-muted d-none d-md-inline" style="font-size: 11.5px;">
-                <i class="bi bi-clock me-1"></i>{{ formatDate(note.updatedAt) }}
-              </span>
-              <div class="d-flex gap-1">
-                <router-link :to="'/notes/' + note.id" class="btn btn-xs btn-action-icon rounded-circle shadow-sm" title="Buka Detail">
-                  <i class="bi bi-arrows-angle-expand"></i>
-                </router-link>
-                <button class="btn btn-xs btn-action-icon rounded-circle shadow-sm" @click="copyNoteContent(note.content)" title="Salin Isi">
-                  <i class="bi bi-clipboard"></i>
-                </button>
-                <button class="btn btn-xs btn-action-icon rounded-circle shadow-sm" @click="editNoteInline(note)" title="Edit Note">
-                  <i class="bi bi-pencil-fill"></i>
-                </button>
-                <button class="btn btn-xs btn-action-icon text-danger rounded-circle shadow-sm" @click="deleteNoteDirect(note.id)" title="Hapus">
-                  <i class="bi bi-trash-fill"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. NOTES KANBAN BOARD VIEW -->
-      <div v-else-if="filteredNotes.length > 0 && viewLayout === 'kanban'" class="kanban-board-wrapper pb-3">
-        <div class="d-flex gap-3 align-items-start kanban-columns-container">
-          <div
-            v-for="col in activeKanbanColumns"
-            :key="col.key"
-            class="kanban-column bg-light rounded-4 p-3 border shadow-2xs flex-shrink-0"
-            style="width: 310px; min-height: 480px;"
-            @dragover.prevent
-            @drop="onDropToColumn(col.key)"
-          >
-            <!-- Column Header -->
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-              <div class="d-flex align-items-center gap-2">
-                <i class="bi" :class="col.icon" :style="{ color: col.colorHex }"></i>
-                <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;">{{ col.label }}</h6>
-                <span class="badge rounded-pill" :class="col.badgeClass">
-                  {{ getNotesForColumn(col.key).length }}
-                </span>
-              </div>
-              <button
-                type="button"
-                class="btn btn-xs btn-outline-secondary rounded-circle"
-                @click="openAddNoteForColumn(col.key)"
-                :title="'Tambah note di kolom ' + col.label"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
-            </div>
-
-            <!-- Notes in this Column -->
-            <div class="d-flex flex-column gap-2.5 kanban-cards-list">
-              <div
-                v-for="note in getNotesForColumn(col.key)"
-                :key="note.id"
-                class="card border-0 shadow-sm rounded-3 p-3 kanban-note-card bg-white position-relative hover-card cursor-grab"
-                draggable="true"
-                @dragstart="onDragStart($event, note)"
-                :style="{ borderLeft: `5px solid ${note.color || '#fef08a'} !important` }"
-              >
-                <!-- Title & Checkbox -->
-                <div class="d-flex justify-content-between align-items-start mb-1.5">
-                  <div class="d-flex align-items-center gap-1.5 flex-grow-1 overflow-hidden me-1">
-                    <input type="checkbox" class="form-check-input mt-0" :value="note.id" v-model="selectedIds" />
-                    <router-link :to="'/notes/' + note.id" class="text-decoration-none text-truncate">
-                      <h6 class="fw-bold mb-0 text-dark text-truncate hover-title note-card-title" style="font-size: 13.5px;">
-                        {{ note.title || 'Untitled Note' }}
-                      </h6>
-                    </router-link>
-                  </div>
-                  <div class="d-flex gap-1 flex-shrink-0">
-                    <button class="btn btn-xs btn-action-icon p-1 rounded-circle" @click="editNoteInline(note)" title="Edit">
-                      <i class="bi bi-pencil-fill" style="font-size: 11px;"></i>
-                    </button>
-                    <button class="btn btn-xs btn-action-icon text-danger p-1 rounded-circle" @click="deleteNoteDirect(note.id)" title="Hapus">
-                      <i class="bi bi-trash-fill" style="font-size: 11px;"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Badges -->
-                <div class="d-flex gap-1 mb-1.5 flex-wrap">
-                  <span v-if="kanbanGroupBy === 'color'" class="badge rounded-pill px-1.5 py-0.5 small" :class="getStatusBadgeClass(note.status)" style="font-size: 9.5px;">
-                    {{ getStatusLabel(note.status) }}
-                  </span>
-                  <span v-if="hasMermaid(note.content)" class="badge bg-indigo-subtle text-indigo px-1.5 py-0.5 rounded-pill" style="font-size: 9.5px;">
-                    <i class="bi bi-diagram-3 me-0.5"></i> Flowchart
-                  </span>
-                  <span v-if="hasImages(note.content)" class="badge bg-info-subtle text-info-emphasis px-1.5 py-0.5 rounded-pill" style="font-size: 9.5px;">
-                    <i class="bi bi-image me-0.5"></i> Image
-                  </span>
-                </div>
-
-                <!-- Content Excerpt -->
-                <router-link :to="'/notes/' + note.id" class="text-decoration-none d-block mb-2">
-                  <p class="small text-muted mb-0 font-monospace" style="font-size: 11.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ cleanPlainTextExcerpt(note.content) || 'Buka untuk melihat isi dokumen...' }}
-                  </p>
-                </router-link>
-
-                <!-- Footer: Date & Quick Move -->
-                <div class="d-flex justify-content-between align-items-center pt-2 border-top note-card-footer" style="font-size: 11px;">
-                  <span class="text-muted"><i class="bi bi-clock me-0.5"></i>{{ formatDate(note.updatedAt) }}</span>
-                  <!-- Quick Move Dropdown -->
-                  <div class="dropdown">
-                    <button class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0.5 small dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                      Pindah
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm small p-1">
-                      <li v-for="targetCol in activeKanbanColumns" :key="targetCol.key">
-                        <button
-                          class="dropdown-item py-1 rounded-2 small"
-                          :class="{ 'active fw-bold': targetCol.key === col.key }"
-                          @click="moveNoteToTargetColumn(note, targetCol.key)"
-                        >
-                          <i class="bi me-1" :class="targetCol.icon" :style="{ color: targetCol.colorHex }"></i> {{ targetCol.label }}
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Column Empty Drop Placeholder -->
-              <div v-if="getNotesForColumn(col.key).length === 0" class="text-center py-5 border-2 border-dashed rounded-3 text-muted small bg-white opacity-75">
-                <i class="bi bi-inbox d-block fs-3 mb-1 text-secondary"></i>
-                <span>Kolom Kosong</span>
-                <div class="mt-2">
-                  <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1" @click="openAddNoteForColumn(col.key)">
-                    + Tambah Note
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -565,7 +322,7 @@
 
       <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
         <form @submit.prevent="saveNote" class="row g-4">
-          <div class="col-md-5">
+          <div class="col-md-8">
             <label class="form-label fw-bold text-dark fs-6">Judul Catatan / Dokumen <span class="text-danger">*</span></label>
             <input
               type="text"
@@ -575,16 +332,6 @@
               placeholder="Contoh: Arsitektur Sistem, Flowchart Alur & Checklist KPI"
               required
             />
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label fw-bold text-dark fs-6">Status Alur Kerja (Kanban)</label>
-            <select class="form-select form-select-lg border-2 rounded-3 fs-6" v-model="form.status" @change="onFormInput">
-              <option value="draft">💡 Ide & Draft</option>
-              <option value="in_progress">⚡ Sedang Dikerjakan</option>
-              <option value="important">📌 Prioritas & Penting</option>
-              <option value="completed">✅ Selesai & Arsip</option>
-            </select>
           </div>
 
           <div class="col-md-4">
@@ -991,8 +738,7 @@ export default {
     const form = ref({
       title: '',
       content: '',
-      color: '#fef08a',
-      status: 'draft'
+      color: '#fef08a'
     });
 
     // Modals for Image & Mermaid
@@ -1025,134 +771,6 @@ export default {
 
     const searchQuery = ref('');
     const selectedColor = ref('all');
-
-    // Layout toggles: 'grid' | 'list' | 'kanban'
-    const viewLayout = ref(localStorage.getItem('rk_notes_view_layout') || 'grid');
-    const setViewLayout = (layout) => {
-      viewLayout.value = layout;
-      localStorage.setItem('rk_notes_view_layout', layout);
-    };
-
-    // Kanban grouping: 'status' | 'color'
-    const kanbanGroupBy = ref(localStorage.getItem('rk_notes_kanban_group') || 'status');
-    const setKanbanGroupBy = (group) => {
-      kanbanGroupBy.value = group;
-      localStorage.setItem('rk_notes_kanban_group', group);
-    };
-
-    const statusColumns = [
-      { key: 'draft', label: 'Ide & Draft', icon: 'bi-lightbulb-fill', colorHex: '#ca8a04', badgeClass: 'bg-warning-subtle text-warning-emphasis' },
-      { key: 'in_progress', label: 'Sedang Dikerjakan', icon: 'bi-gear-wide-connected', colorHex: '#2563eb', badgeClass: 'bg-primary-subtle text-primary' },
-      { key: 'important', label: 'Prioritas & Penting', icon: 'bi-star-fill', colorHex: '#dc2626', badgeClass: 'bg-danger-subtle text-danger' },
-      { key: 'completed', label: 'Selesai & Arsip', icon: 'bi-check-circle-fill', colorHex: '#16a34a', badgeClass: 'bg-success-subtle text-success' }
-    ];
-
-    const colorColumns = [
-      { key: '#fef08a', label: 'Kuning Pastel', icon: 'bi-circle-fill', colorHex: '#ca8a04', badgeClass: 'bg-warning-subtle text-dark' },
-      { key: '#bae6fd', label: 'Biru Langit', icon: 'bi-circle-fill', colorHex: '#0284c7', badgeClass: 'bg-info-subtle text-dark' },
-      { key: '#bbf7d0', label: 'Hijau Mint', icon: 'bi-circle-fill', colorHex: '#16a34a', badgeClass: 'bg-success-subtle text-dark' },
-      { key: '#fbcfe8', label: 'Merah Muda', icon: 'bi-circle-fill', colorHex: '#db2777', badgeClass: 'bg-danger-subtle text-dark' },
-      { key: '#e9d5ff', label: 'Ungu Lavender', icon: 'bi-circle-fill', colorHex: '#9333ea', badgeClass: 'bg-purple-subtle text-dark' }
-    ];
-
-    const activeKanbanColumns = computed(() => {
-      return kanbanGroupBy.value === 'color' ? colorColumns : statusColumns;
-    });
-
-    const getNotesForColumn = (colKey) => {
-      return filteredNotes.value.filter(n => {
-        if (kanbanGroupBy.value === 'color') {
-          return (n.color || '#fef08a') === colKey;
-        } else {
-          const st = n.status || 'draft';
-          return st === colKey;
-        }
-      });
-    };
-
-    const getStatusLabel = (status) => {
-      switch (status) {
-        case 'in_progress':
-          return 'Sedang Dikerjakan';
-        case 'important':
-          return 'Prioritas';
-        case 'completed':
-          return 'Selesai';
-        default:
-          return 'Draft';
-      }
-    };
-
-    const getStatusBadgeClass = (status) => {
-      switch (status) {
-        case 'in_progress':
-          return 'bg-primary text-white';
-        case 'important':
-          return 'bg-danger text-white';
-        case 'completed':
-          return 'bg-success text-white';
-        default:
-          return 'bg-secondary-subtle text-dark';
-      }
-    };
-
-    const cleanPlainTextExcerpt = (str) => {
-      if (!str) return '';
-      return str
-        .replace(/```[\s\S]*?```/g, ' [Kode/Diagram] ')
-        .replace(/!\[.*?\]\(.*?\)/g, ' [Gambar] ')
-        .replace(/[#*`_~[\]()]/g, '')
-        .replace(/\n+/g, ' ')
-        .trim();
-    };
-
-    const draggedNote = ref(null);
-    const onDragStart = (event, note) => {
-      draggedNote.value = note;
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('text/plain', note.id);
-      }
-    };
-
-    const onDropToColumn = (colKey) => {
-      if (!draggedNote.value) return;
-      moveNoteToTargetColumn(draggedNote.value, colKey);
-      draggedNote.value = null;
-    };
-
-    const moveNoteToTargetColumn = (note, targetColKey) => {
-      if (kanbanGroupBy.value === 'color') {
-        if (note.color !== targetColKey) {
-          store.dispatch('updateNote', {
-            ...note,
-            color: targetColKey,
-            updatedAt: new Date().toISOString()
-          });
-          showToast('Warna catatan berhasil diubah!');
-        }
-      } else {
-        if ((note.status || 'draft') !== targetColKey) {
-          store.dispatch('updateNote', {
-            ...note,
-            status: targetColKey,
-            updatedAt: new Date().toISOString()
-          });
-          showToast(`Catatan dipindahkan ke ${getStatusLabel(targetColKey)}`);
-        }
-      }
-    };
-
-    const openAddNoteForColumn = (colKey) => {
-      form.value = {
-        title: '',
-        content: '# Catatan Baru\n\n- [ ] Checklist tugas...',
-        color: kanbanGroupBy.value === 'color' ? colKey : '#fef08a',
-        status: kanbanGroupBy.value === 'status' ? colKey : 'draft'
-      };
-      isEditing.value = false;
-      activeMode.value = 'editor';
-    };
 
     const notes = computed(() => store.getters.getNotes || []);
 
@@ -1288,8 +906,7 @@ export default {
           form.value = {
             title: '',
             content: '# Catatan Proyek & Alur Kerja\n\n- [ ] Checklist tugas 1\n- [ ] Checklist tugas 2\n\n```mermaid\nflowchart TD\n    A[Ide Proyek] --> B[Implementasi]\n    B --> C[Selesai]\n```',
-            color: '#fef08a',
-            status: 'draft'
+            color: '#fef08a'
           };
         }
       }
@@ -1303,10 +920,7 @@ export default {
     const editNoteInline = (note) => {
       isEditing.value = true;
       editingId.value = note.id;
-      form.value = {
-        ...note,
-        status: note.status || 'draft'
-      };
+      form.value = { ...note };
       activeMode.value = 'editor';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -1334,26 +948,16 @@ export default {
       }
 
       if (isEditing.value) {
-        store.dispatch('updateNote', {
-          ...form.value,
-          status: form.value.status || 'draft',
-          id: editingId.value,
-          updatedAt: new Date().toISOString()
-        });
+        store.dispatch('updateNote', { ...form.value, id: editingId.value, updatedAt: new Date().toISOString() });
         showToast('Note berhasil diperbarui!');
       } else {
-        store.dispatch('addNote', {
-          ...form.value,
-          status: form.value.status || 'draft',
-          id: 'note_' + Date.now(),
-          updatedAt: new Date().toISOString()
-        });
+        store.dispatch('addNote', { ...form.value, id: 'note_' + Date.now(), updatedAt: new Date().toISOString() });
         showToast('Note baru berhasil disimpan!');
       }
 
       safeRemoveItem(DRAFT_KEY);
       draftSaved.value = false;
-      form.value = { title: '', content: '', color: '#fef08a', status: 'draft' };
+      form.value = { title: '', content: '', color: '#fef08a' };
       isEditing.value = false;
       editingId.value = null;
       activeMode.value = 'list';
@@ -1729,20 +1333,7 @@ export default {
       hasImages,
       getWordCount,
       getNotesCountByColor,
-      formatDate,
-      viewLayout,
-      setViewLayout,
-      kanbanGroupBy,
-      setKanbanGroupBy,
-      activeKanbanColumns,
-      getNotesForColumn,
-      getStatusLabel,
-      getStatusBadgeClass,
-      cleanPlainTextExcerpt,
-      onDragStart,
-      onDropToColumn,
-      moveNoteToTargetColumn,
-      openAddNoteForColumn
+      formatDate
     };
   }
 };
@@ -2037,71 +1628,5 @@ export default {
 :global(.oled-theme) .bg-indigo-subtle {
   background-color: rgba(99, 102, 241, 0.2) !important;
   color: #c7d2fe !important;
-}
-
-/* Kanban & List View Styling */
-.cursor-grab {
-  cursor: grab;
-}
-.cursor-grab:active {
-  cursor: grabbing;
-}
-
-.kanban-board-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.kanban-column {
-  min-width: 290px;
-  max-width: 320px;
-  background-color: #f8fafc;
-  border-color: #e2e8f0 !important;
-  transition: background-color 0.2s ease;
-}
-
-.kanban-note-card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.kanban-note-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
-}
-
-.note-list-row {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.note-list-row:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
-}
-
-:global(.dark-theme) .kanban-column,
-:global(.dark-mode) .kanban-column {
-  background-color: var(--bg-surface) !important;
-  border-color: var(--border-color) !important;
-}
-
-:global(.oled-theme) .kanban-column {
-  background-color: #0d0d0d !important;
-  border-color: #27272a !important;
-}
-
-:global(.dark-theme) .kanban-note-card,
-:global(.dark-mode) .kanban-note-card,
-:global(.dark-theme) .note-list-row,
-:global(.dark-mode) .note-list-row {
-  background-color: var(--bg-surface) !important;
-  color: var(--text-main) !important;
-  border: 1px solid var(--border-color) !important;
-}
-
-:global(.oled-theme) .kanban-note-card,
-:global(.oled-theme) .note-list-row {
-  background-color: #121212 !important;
-  color: #ffffff !important;
-  border: 1px solid #27272a !important;
 }
 </style>

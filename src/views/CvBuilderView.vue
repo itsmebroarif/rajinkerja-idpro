@@ -128,100 +128,26 @@
       </div>
     </div>
 
-    <!-- Dedicated Top Full-Width Wizard Stepper Bar (Langkah 1-2-3-4-5 di paling atas secara rapih) -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4 no-print overflow-hidden">
-      <div class="p-3 p-md-4">
-        <!-- Top Toolbar inside Stepper Card: Step Title, Status & Mode Toggle -->
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom">
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-primary text-white px-2.5 py-1 rounded-pill fw-bold">
-              Tahap {{ currentStep }} dari 5
-            </span>
-            <h6 class="fw-bold text-dark mb-0 fs-6">
-              {{ steps[currentStep - 1] ? steps[currentStep - 1].title : 'Informasi Kontak' }}
-            </h6>
-          </div>
-
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-pill small">
-              <i class="bi bi-stars text-warning me-1"></i> ATS: {{ currentAtsScore.score }}/100 ({{ currentAtsScore.grade }})
-            </span>
-
-            <!-- Toggle Mode: Wizard Bertahap vs Semua Formulir -->
-            <div class="btn-group btn-group-sm p-0.5 bg-light rounded-3 border">
-              <button
-                type="button"
-                class="btn btn-xs rounded-2 px-2.5 py-1 transition-all"
-                :class="cvEditorMode === 'wizard' ? 'bg-white shadow-xs text-primary fw-bold' : 'text-muted border-0'"
-                @click="cvEditorMode = 'wizard'"
-                title="Navigasi Langkah demi Langkah (Wizard)"
-              >
-                <i class="bi bi-signpost-split me-1"></i> Mode Wizard
-              </button>
-              <button
-                type="button"
-                class="btn btn-xs rounded-2 px-2.5 py-1 transition-all"
-                :class="cvEditorMode === 'all-in-one' ? 'bg-white shadow-xs text-primary fw-bold' : 'text-muted border-0'"
-                @click="cvEditorMode = 'all-in-one'"
-                title="Tampilkan Semua Bagian Formulir Sekaligus"
-              >
-                <i class="bi bi-view-stacked me-1"></i> Semua Formulir
-              </button>
-            </div>
-
-            <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2.5 py-1 bg-white" @click="loadSampleCv" title="Muat Contoh Data Profil CV">
-              <i class="bi bi-magic me-1"></i> Contoh
-            </button>
-          </div>
-        </div>
-
-        <!-- Horizontal Stepper 1 - 2 - 3 - 4 - 5 with Connecting Progress Line -->
-        <div class="top-wizard-stepper">
-          <!-- Background track line -->
-          <div class="progress top-wizard-progress" style="height: 4px;">
-            <div
-              class="progress-bar bg-primary transition-all"
-              role="progressbar"
-              :style="{ width: (((currentStep - 1) / 4) * 100) + '%' }"
-            ></div>
-          </div>
-
-          <!-- 5 Step Interactive Buttons -->
-          <div class="d-flex justify-content-between position-relative" style="z-index: 2;">
-            <button
-              type="button"
-              v-for="(step, idx) in steps"
-              :key="step.id"
-              class="top-step-btn btn p-2 rounded-3 text-center transition-all d-flex flex-column align-items-center flex-fill"
-              :class="currentStep === idx + 1 ? 'active-step bg-primary-subtle' : 'bg-white'"
-              @click="currentStep = idx + 1"
-            >
-              <div
-                class="top-step-circle rounded-circle d-flex align-items-center justify-content-center fw-bold transition-all mb-1.5"
-                :class="[
-                  currentStep === idx + 1
-                    ? 'bg-primary text-white shadow-sm ring-4'
-                    : (currentStep > idx + 1
-                        ? 'bg-success text-white shadow-xs'
-                        : 'bg-light border text-muted')
-                ]"
-              >
-                <i v-if="currentStep > idx + 1" class="bi bi-check-lg fw-bold"></i>
-                <span v-else>{{ idx + 1 }}</span>
-              </div>
-              <span
-                class="small fw-bold d-block text-truncate w-100"
-                :class="currentStep === idx + 1 ? 'text-primary' : (currentStep > idx + 1 ? 'text-dark' : 'text-muted')"
-                style="font-size: 13px;"
-              >
-                {{ step.name }}
-              </span>
-              <span class="d-none d-md-block text-muted text-truncate w-100 opacity-75" style="font-size: 11px;">
-                {{ step.desc }}
-              </span>
-            </button>
-          </div>
-        </div>
+    <!-- Wizard Navigation Stepper (no-print) -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white mb-4 p-3 overflow-x-auto no-print">
+      <div class="d-flex justify-content-between align-items-center min-w-600 px-2">
+        <button
+          v-for="(step, idx) in steps"
+          :key="step.id"
+          type="button"
+          class="btn border-0 d-flex align-items-center gap-2 p-2 rounded-3 text-start transition-all"
+          :class="currentStep === idx + 1 ? 'bg-primary text-white fw-bold shadow-sm' : (currentStep > idx + 1 ? 'bg-success-subtle text-success fw-semibold' : 'text-muted')"
+          @click="currentStep = idx + 1"
+        >
+          <span
+            class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+            :class="currentStep === idx + 1 ? 'bg-white text-primary' : (currentStep > idx + 1 ? 'bg-success text-white' : 'bg-light text-muted border')"
+            style="width: 28px; height: 28px; font-size: 0.85rem;"
+          >
+            {{ idx + 1 }}
+          </span>
+          <span class="small">{{ step.name }}</span>
+        </button>
       </div>
     </div>
 
@@ -231,28 +157,17 @@
       <div class="col-lg-6 no-print" v-if="currentStep <= 5">
         <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
           <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-            <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-              <i class="bi bi-sliders2 text-primary"></i>
-              <span v-if="cvMode === 'bulk'" class="badge bg-success me-1">Kandidat #{{ activeCandidateIndex + 1 }}</span>
-              <span>{{ cvEditorMode === 'all-in-one' ? 'Formulir CV & Resume Lengkap' : `Langkah ${currentStep}: ${steps[currentStep - 1] ? steps[currentStep - 1].name : ''}` }}</span>
+            <h5 class="fw-bold text-dark mb-0">
+              <span v-if="cvMode === 'bulk'" class="badge bg-success me-2">Kandidat #{{ activeCandidateIndex + 1 }}</span>
+              {{ steps[currentStep - 1].title }}
             </h5>
-            <span class="small text-muted" v-if="cvEditorMode === 'wizard'">
-              Langkah {{ currentStep }} / 5
-            </span>
-            <span class="badge bg-light text-dark border small" v-else>ATS: {{ currentAtsScore.score }}/100</span>
+            <span class="badge bg-light text-dark border small">ATS: {{ currentAtsScore.score }}/100</span>
           </div>
 
           <!-- ======================================================== -->
           <!-- STEP 1: INFORMASI KONTAK & FOTO PROFIL                   -->
           <!-- ======================================================== -->
-          <div v-show="cvEditorMode === 'all-in-one' || currentStep === 1" class="wizard-section mb-4">
-            <div v-if="cvEditorMode === 'all-in-one'" class="section-badge-header mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
-              <h6 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
-                <span class="badge bg-primary text-white rounded-circle p-1 px-2">1</span>
-                <span>Informasi Kontak & Foto Profil</span>
-              </h6>
-              <span class="small text-muted">Data diri, kontak & foto</span>
-            </div>
+          <div v-if="currentStep === 1">
             <!-- PHOTO PROFILE UPLOADER & CUSTOMIZER BOX -->
             <div class="p-3 bg-light rounded-4 border mb-4">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -401,14 +316,7 @@
           <!-- ======================================================== -->
           <!-- STEP 2: PENGALAMAN KERJA                                 -->
           <!-- ======================================================== -->
-          <div v-show="cvEditorMode === 'all-in-one' || currentStep === 2" class="wizard-section mb-4">
-            <div v-if="cvEditorMode === 'all-in-one'" class="section-badge-header mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
-              <h6 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
-                <span class="badge bg-primary text-white rounded-circle p-1 px-2">2</span>
-                <span>Pengalaman Kerja</span>
-              </h6>
-              <span class="small text-muted">Riwayat karir & tanggung jawab</span>
-            </div>
+          <div v-else-if="currentStep === 2">
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
               <h6 class="fw-bold text-dark mb-0">Daftar Pengalaman Kerja</h6>
               <button class="btn btn-sm btn-primary rounded-pill px-3" @click="addExperience">
@@ -453,14 +361,7 @@
           <!-- ======================================================== -->
           <!-- STEP 3: RIWAYAT PENDIDIKAN                               -->
           <!-- ======================================================== -->
-          <div v-show="cvEditorMode === 'all-in-one' || currentStep === 3" class="wizard-section mb-4">
-            <div v-if="cvEditorMode === 'all-in-one'" class="section-badge-header mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
-              <h6 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
-                <span class="badge bg-primary text-white rounded-circle p-1 px-2">3</span>
-                <span>Riwayat Pendidikan</span>
-              </h6>
-              <span class="small text-muted">Gelar, universitas & IPK</span>
-            </div>
+          <div v-else-if="currentStep === 3">
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
               <h6 class="fw-bold text-dark mb-0">Daftar Riwayat Pendidikan</h6>
               <button class="btn btn-sm btn-primary rounded-pill px-3" @click="addEducation">
@@ -501,14 +402,7 @@
           <!-- ======================================================== -->
           <!-- STEP 4: SKILLS, BAHASA & SERTIFIKASI                     -->
           <!-- ======================================================== -->
-          <div v-show="cvEditorMode === 'all-in-one' || currentStep === 4" class="wizard-section mb-4">
-            <div v-if="cvEditorMode === 'all-in-one'" class="section-badge-header mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
-              <h6 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
-                <span class="badge bg-primary text-white rounded-circle p-1 px-2">4</span>
-                <span>Keahlian, Bahasa & Sertifikasi</span>
-              </h6>
-              <span class="small text-muted">Skills, bahasa & sertifikat ATS</span>
-            </div>
+          <div v-else-if="currentStep === 4">
             <div class="mb-3">
               <label class="form-label fw-bold text-dark small">Technical Skills & Keahlian Utama (Pisahkan dengan Koma)</label>
               <input type="text" class="form-control" :value="currentSkillsString" @input="updateActiveSkills" placeholder="Vue.js 3, TypeScript, Tailwind CSS, Node.js, REST API, Git, Docker" />
@@ -529,14 +423,7 @@
           <!-- ======================================================== -->
           <!-- STEP 5: 36 TEMPLATES + CUSTOM LAYOUT BUILDER             -->
           <!-- ======================================================== -->
-          <div v-show="cvEditorMode === 'all-in-one' || currentStep === 5" class="wizard-section mb-4">
-            <div v-if="cvEditorMode === 'all-in-one'" class="section-badge-header mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
-              <h6 class="fw-bold text-primary mb-0 d-flex align-items-center gap-2">
-                <span class="badge bg-primary text-white rounded-circle p-1 px-2">5</span>
-                <span>Pilih 36 Layout Desain & Custom Studio</span>
-              </h6>
-              <span class="small text-muted">Template layout, tipografi & warna</span>
-            </div>
+          <div v-else-if="currentStep === 5">
             <!-- Layout Mode Switch: Presets vs Custom Studio -->
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
               <div class="btn-group p-1 bg-light rounded-pill border" role="group">
@@ -800,14 +687,14 @@
           </div>
 
           <!-- Wizard Controls Footer -->
-          <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-4" v-if="cvEditorMode === 'wizard'">
+          <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-4">
             <button class="btn btn-outline-secondary rounded-pill px-4" :disabled="currentStep === 1" @click="currentStep--">
               <i class="bi bi-chevron-left me-1"></i> Sebelumnya
             </button>
-            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" v-if="currentStep < 5" @click="currentStep++">
-              Lanjut ke Langkah {{ currentStep + 1 }} <i class="bi bi-chevron-right ms-1"></i>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold" v-if="currentStep < 5" @click="currentStep++">
+              Lanjut <i class="bi bi-chevron-right ms-1"></i>
             </button>
-            <button class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" v-else @click="saveDraft">
+            <button class="btn btn-success rounded-pill px-4 fw-bold" v-else @click="saveDraft">
               <i class="bi bi-check-circle me-1"></i> Selesai & Simpan
             </button>
           </div>
@@ -1110,7 +997,6 @@ export default {
     const cvMode = ref('single'); // 'single' | 'bulk'
     const isPrintingAll = ref(false);
     const currentStep = ref(1);
-    const cvEditorMode = ref('wizard'); // 'wizard' | 'all-in-one'
     const isSaving = ref(false);
     const selectedCategory = ref('all');
     const customColor = ref('#1e293b');
@@ -1234,25 +1120,47 @@ export default {
     const bulkCandidates = ref([
       {
         id: 'cv_cand_1',
-        fullName: '',
-        jobTitle: '',
-        email: '',
-        phone: '',
-        address: '',
-        linkedin: '',
-        github: '',
-        website: '',
-        avatar: '',
-        showAvatar: false,
+        fullName: 'Arif Permana, S.Kom',
+        jobTitle: 'Software Engineer',
+        email: 'arif.permana@email.com',
+        phone: '081234567890',
+        address: 'Jakarta, Indonesia',
+        linkedin: 'linkedin.com/in/arifpermana',
+        github: 'github.com/arifpermana',
+        website: 'arifpermana.dev',
+        avatar: sampleAvatar,
+        showAvatar: true,
         avatarShape: 'circle',
         avatarSize: 'md',
         avatarPos: 'left',
-        summary: '',
-        experience: [],
-        education: [],
-        skills: [],
-        languages: [],
-        certifications: [],
+        summary: 'Software Engineer berdedikasi tinggi dengan pengalaman 4+ tahun dalam merancang dan mengembangkan arsitektur web modern yang scalable, RESTful API, dan sistem full-stack yang andal menggunakan Vue 3, TypeScript, Node.js, dan cloud infrastructure.',
+        experience: [
+          {
+            company: 'PT Solusi Teknologi Nusantara',
+            position: 'Senior Software Engineer',
+            period: '2022 - Sekarang',
+            location: 'Jakarta Selatan',
+            description: '• Memimpin perancangan dan implementasi 10+ layanan aplikasi berbasis web yang stabil dan terukur.\n• Mengembangkan REST API berkinerja tinggi serta mengoptimalkan query database hingga meningkatkan respons sistem sebesar 40%.\n• Mengelola arsitektur frontend modern menggunakan Vue 3, TypeScript, dan state management terintegrasi.'
+          },
+          {
+            company: 'PT Inovasi Kode Indonesia',
+            position: 'Software Engineer',
+            period: '2020 - 2022',
+            location: 'Jakarta',
+            description: '• Mengembangkan arsitektur backend REST API dan frontend SPA dengan tingkat reliabilitas 99.9%.\n• Berkolaborasi dengan tim produk dan desainer dalam menghadirkan antarmuka pengguna yang intuitif dan responsif.'
+          }
+        ],
+        education: [
+          {
+            institution: 'Universitas Indonesia',
+            degree: 'S1 Teknik Informatika / Ilmu Komputer',
+            period: '2016 - 2020',
+            gpa: '3.84 / 4.00'
+          }
+        ],
+        skills: ['Vue.js 3', 'TypeScript', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'RESTful API', 'Docker', 'Git'],
+        languages: ['Bahasa Indonesia (Native)', 'English (Professional Working)'],
+        certifications: ['Google Cloud Certified Associate Cloud Engineer', 'Meta Front-End Developer Certificate'],
         selectedTemplate: 'ats_clean_1',
         customColor: '#0d6efd',
         cvFont: 'font-sans',
@@ -1268,30 +1176,111 @@ export default {
           sidebarSections: ['contact', 'skills', 'languages', 'certifications'],
           sectionVisibility: {}
         }
+      },
+      {
+        id: 'cv_cand_2',
+        fullName: 'Dwi Retno.R, S.E.',
+        jobTitle: 'Accountant & Admin',
+        email: 'dwiretno.r@accounting.id',
+        phone: '081398765432',
+        address: 'Jakarta, Indonesia',
+        linkedin: 'linkedin.com/in/dwiretnor',
+        github: '',
+        website: '',
+        avatar: sampleAvatar,
+        showAvatar: true,
+        avatarShape: 'rounded',
+        avatarSize: 'md',
+        avatarPos: 'sidebar',
+        summary: 'Profesional Akuntan dan Administrasi berpengalaman 5+ tahun dalam pengelolaan pembukuan, penyusunan laporan keuangan komprehensif, rekonsiliasi bank, kepatuhan perpajakan (PPh & PPN), serta efisiensi manajemen operasional administrasi kantor.',
+        experience: [
+          {
+            company: 'PT Global Niaga Perkasa',
+            position: 'Senior Accountant & Finance Admin',
+            period: '2021 - Sekarang',
+            location: 'Jakarta Pusat',
+            description: '• Menyusun laporan keuangan bulanan, kuartalan, dan tahunan (Neraca, Laba Rugi, Arus Kas) dengan akurasi 100%.\n• Mengelola rekonsiliasi kas/bank harian dan mengaudit bukti transaksi keuangan operasional perusahaan.\n• Mengurus pelaporan pajak perusahaan (e-Faktur, PPh 21/23, e-SPT) secara tertib dan tepat waktu.'
+          },
+          {
+            company: 'PT Mahakarya Mitra Usaha',
+            position: 'Accounting & Administrative Staff',
+            period: '2019 - 2021',
+            location: 'Jakarta',
+            description: '• Memproses invoicing, faktur penjualan, purchase order (PO), dan verifikasi pembayaran tagihan vendor.\n• Mengarsipkan seluruh dokumen keuangan dan administrasi perusahaan secara rapi dan sistematis.'
+          }
+        ],
+        education: [
+          {
+            institution: 'Universitas Gadjah Mada',
+            degree: 'S1 Akuntansi',
+            period: '2015 - 2019',
+            gpa: '3.80 / 4.00'
+          }
+        ],
+        skills: ['Financial Reporting', 'General Ledger & Journaling', 'Tax Compliance (PPh & PPN)', 'Bank Reconciliation', 'Accurate & SAP', 'Microsoft Excel (Advanced)', 'Office Administration', 'Budgeting'],
+        languages: ['Bahasa Indonesia (Native)', 'English (Intermediate / Professional)'],
+        certifications: ['Brevet Pajak A & B Terakreditasi', 'Certified Junior Accountant (CJA)'],
+        selectedTemplate: 'ats_sidebar_left_3',
+        customColor: '#0f766e',
+        cvFont: 'font-sans',
+        customLayoutActive: false,
+        customLayoutConfig: {
+          columnMode: 'two_column',
+          sidebarPosition: 'left',
+          sidebarRatio: '35',
+          headerAlign: 'left',
+          headerBanner: false,
+          avatarPos: 'sidebar',
+          mainSections: ['summary', 'experience', 'education'],
+          sidebarSections: ['contact', 'skills', 'languages', 'certifications'],
+          sectionVisibility: {}
+        }
       }
     ]);
 
     // Single mode primary CV
     const singleCv = ref({
-      fullName: '',
-      jobTitle: '',
-      email: '',
-      phone: '',
-      address: '',
-      linkedin: '',
-      github: '',
-      website: '',
-      avatar: '',
-      showAvatar: false,
+      fullName: 'Arif Permana, S.Kom',
+      jobTitle: 'Software Engineer',
+      email: 'arif.permana@email.com',
+      phone: '081234567890',
+      address: 'Jakarta, Indonesia',
+      linkedin: 'linkedin.com/in/arifpermana',
+      github: 'github.com/arifpermana',
+      website: 'arifpermana.dev',
+      avatar: sampleAvatar,
+      showAvatar: true,
       avatarShape: 'circle',
       avatarSize: 'md',
       avatarPos: 'left',
-      summary: '',
-      experience: [],
-      education: [],
-      skills: [],
-      languages: [],
-      certifications: [],
+      summary: 'Software Engineer berdedikasi tinggi dengan pengalaman 4+ tahun dalam merancang dan mengembangkan arsitektur web modern yang scalable, RESTful API, dan sistem full-stack yang andal menggunakan Vue 3, TypeScript, Node.js, dan cloud infrastructure.',
+      experience: [
+        {
+          company: 'PT Solusi Teknologi Nusantara',
+          position: 'Senior Software Engineer',
+          period: '2022 - Sekarang',
+          location: 'Jakarta Selatan',
+          description: '• Memimpin perancangan dan implementasi 10+ layanan aplikasi berbasis web yang stabil dan terukur.\n• Mengembangkan REST API berkinerja tinggi serta mengoptimalkan query database hingga meningkatkan respons sistem sebesar 40%.\n• Mengelola arsitektur frontend modern menggunakan Vue 3, TypeScript, dan state management terintegrasi.'
+        },
+        {
+          company: 'PT Inovasi Kode Indonesia',
+          position: 'Software Engineer',
+          period: '2020 - 2022',
+          location: 'Jakarta',
+          description: '• Mengembangkan arsitektur backend REST API dan frontend SPA dengan tingkat reliabilitas 99.9%.\n• Berkolaborasi dengan tim produk dan desainer dalam menghadirkan antarmuka pengguna yang intuitif dan responsif.'
+        }
+      ],
+      education: [
+        {
+          institution: 'Universitas Indonesia',
+          degree: 'S1 Teknik Informatika / Ilmu Komputer',
+          period: '2016 - 2020',
+          gpa: '3.84 / 4.00'
+        }
+      ],
+      skills: ['Vue.js 3', 'TypeScript', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'RESTful API', 'Docker', 'Git'],
+      languages: ['Bahasa Indonesia (Native)', 'English (Professional Working)'],
+      certifications: ['Google Cloud Certified Associate Cloud Engineer', 'Meta Front-End Developer Certificate'],
       selectedTemplate: 'ats_clean_1',
       customLayoutActive: false,
       customLayoutConfig: {
@@ -1408,30 +1397,12 @@ export default {
     };
 
     const steps = [
-      { id: 1, name: 'Kontak & Foto', title: '1. Informasi Kontak & Foto Profil', desc: 'Data diri, kontak & foto' },
-      { id: 2, name: 'Pengalaman', title: '2. Pengalaman Kerja', desc: 'Riwayat karir & tanggung jawab' },
-      { id: 3, name: 'Pendidikan', title: '3. Riwayat Pendidikan', desc: 'Gelar, universitas & IPK' },
-      { id: 4, name: 'Skills & Sertif', title: '4. Keahlian, Bahasa & Sertifikasi', desc: 'Kompetensi & lisensi ATS' },
-      { id: 5, name: '36 Layout & Studio', title: '5. Pilih 36 Layout Desain & Custom Studio', desc: 'Template & tipografi' }
+      { id: 1, name: 'Kontak & Foto', title: '1. Informasi Kontak & Foto Profil' },
+      { id: 2, name: 'Pengalaman', title: '2. Pengalaman Kerja' },
+      { id: 3, name: 'Pendidikan', title: '3. Riwayat Pendidikan' },
+      { id: 4, name: 'Skills & Sertif', title: '4. Keahlian, Bahasa & Sertifikasi' },
+      { id: 5, name: '36 Layout & Studio', title: '5. Pilih 36 Layout Desain & Custom Studio' }
     ];
-
-    const loadSampleCv = () => {
-      activeCv.value.fullName = 'Arif Permana Putrasuryana, S.Kom';
-      activeCv.value.jobTitle = 'Senior Software Engineer & UI/UX Specialist';
-      activeCv.value.email = 'arif.permana@email.com';
-      activeCv.value.phone = '081234567890';
-      activeCv.value.address = 'Jakarta, Indonesia';
-      activeCv.value.linkedin = 'linkedin.com/in/arifpermana';
-      activeCv.value.github = 'github.com/arifpermana';
-      activeCv.value.website = 'arifpermana.dev';
-      Swal.fire({
-        icon: 'success',
-        title: 'Data Profil Dimuat',
-        text: 'Contoh data profil CV profesional berhasil dimuat.',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    };
 
     const layoutCategories = [
       { id: 'all', name: 'Semua (36)' },
@@ -2066,26 +2037,41 @@ export default {
 
     // Bulk Management Functions
     const addNewCandidate = () => {
+      const nextNum = bulkCandidates.value.length + 1;
       bulkCandidates.value.push({
         id: 'cv_cand_' + Date.now(),
-        fullName: '',
-        jobTitle: '',
-        email: '',
-        phone: '',
-        address: '',
+        fullName: 'Kandidat ' + nextNum,
+        jobTitle: 'Posisi / Profesi',
+        email: 'kandidat' + nextNum + '@email.com',
+        phone: '081234567890',
+        address: 'Jakarta, Indonesia',
         linkedin: '',
         github: '',
         website: '',
-        avatar: '',
-        showAvatar: false,
+        avatar: sampleAvatar,
+        showAvatar: true,
         avatarShape: 'circle',
         avatarSize: 'md',
-        avatarPos: 'left',
-        summary: '',
-        experience: [],
-        education: [],
-        skills: [],
-        languages: [],
+        summary: 'Rangkuman profesional profil kandidat...',
+        experience: [
+          {
+            company: 'PT Perusahaan Reksa',
+            position: 'Staff Profesional',
+            period: '2023 - Sekarang',
+            location: 'Jakarta',
+            description: '• Melaksanakan tanggung jawab operasional dan pencapaian target kerja.'
+          }
+        ],
+        education: [
+          {
+            institution: 'Universitas Indonesia',
+            degree: 'S1 Sarjana',
+            period: '2018 - 2022',
+            gpa: '3.75'
+          }
+        ],
+        skills: ['Manajemen Kerja', 'Komunikasi', 'Analisis Data', 'Problem Solving'],
+        languages: ['Bahasa Indonesia (Native)', 'English (Conversational)'],
         certifications: [],
         selectedTemplate: 'ats_clean_1',
         customColor: '#1e293b',
@@ -2486,8 +2472,6 @@ export default {
       cvMode,
       isPrintingAll,
       currentStep,
-      cvEditorMode,
-      loadSampleCv,
       isSaving,
       steps,
       layoutCategories,
@@ -2594,45 +2578,6 @@ export default {
 
 .hover-bg-white-20:hover {
   background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Wizard Stepper Styling */
-.top-wizard-stepper {
-  position: relative;
-  padding: 4px 6px;
-}
-
-.top-wizard-progress {
-  position: absolute;
-  top: 26px;
-  left: 10%;
-  right: 10%;
-  z-index: 1;
-  background-color: var(--border-color, #e2e8f0);
-}
-
-.top-step-btn {
-  cursor: pointer;
-  border: 1.5px solid transparent;
-}
-
-.top-step-btn.active-step {
-  border-color: rgba(37, 99, 235, 0.3) !important;
-}
-
-.top-step-circle {
-  width: 38px;
-  height: 38px;
-  font-size: 14px;
-  z-index: 2;
-}
-
-.ring-4 {
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
-}
-
-.shadow-2xs {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .cv-preview-container-scroll {

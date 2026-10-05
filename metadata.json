@@ -1,6 +1,6 @@
 {
   "name": "TaskArts",
-  "description": "Platform pengorganisir pekerjaan, sistem keuangan akuntansi, integrasi Google Workspace (Drive, Sheets, Meet, Contacts, Calendar), dan Mode Desktop OS Samsung DeX.",
+  "description": "Platform pengorganisir pekerjaan, tugas harian, proyek kantor, keuangan, dan produktivitas karyawan & profesional.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

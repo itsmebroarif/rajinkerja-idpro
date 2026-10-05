@@ -25,7 +25,7 @@
     </div>
 
     <!-- 3D Canvas Area -->
-    <div ref="canvasContainer" class="w-100 position-relative" style="height: clamp(340px, 58vh, 480px); cursor: pointer;" @click="placeBlock"></div>
+    <div ref="canvasContainer" class="w-100 position-relative" style="height: 480px; cursor: pointer;" @click="placeBlock"></div>
 
     <!-- Start / Game Over Overlay -->
     <div v-if="!isPlaying || isGameOver" class="position-absolute inset-0 bg-dark bg-opacity-85 d-flex flex-column align-items-center justify-content-center text-white z-3 p-4 text-center">

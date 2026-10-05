@@ -1506,13 +1506,12 @@ export default {
 .m3-app-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px 6px;
+  gap: 14px 8px;
 }
 
-@media (max-width: 360px) {
+@media (max-width: 340px) {
   .m3-app-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px 8px;
   }
 }
 
@@ -1534,9 +1533,9 @@ export default {
 }
 
 .m3-app-icon-squircle {
-  width: 52px;
-  height: 52px;
-  border-radius: 15px;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1551,7 +1550,7 @@ export default {
 }
 
 .m3-app-icon {
-  font-size: 23px;
+  font-size: 26px;
   line-height: 1;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
 }

@@ -1,27 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
 import HomeView from "../views/HomeView.vue";
-import { isAuthenticated } from "../utils/firebase";
 
 const routes = [
   {
     path: "/",
-    name: "login-root",
-    component: LoginView,
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: LoginView,
-  },
-  {
-    path: "/home",
     name: "home",
     component: HomeView,
-  },
-  {
-    path: "/dashboard",
-    redirect: "/home",
   },
   {
     path: "/contacts",
@@ -301,107 +285,6 @@ const routes = [
   {
     path: "/drafts",
     redirect: "/medium-draft",
-  },
-  // Finance System Modules
-  {
-    path: "/finance-cashflow",
-    name: "finance-cashflow",
-    component: () => import("../views/CashFlowManagementView.vue"),
-  },
-  {
-    path: "/finance-ap-ar",
-    name: "finance-ap-ar",
-    component: () => import("../views/AccountsPayableReceivableView.vue"),
-  },
-  {
-    path: "/finance-expenses",
-    name: "finance-expenses",
-    component: () => import("../views/ExpenseReimbursementView.vue"),
-  },
-  {
-    path: "/finance-budgeting",
-    name: "finance-budgeting",
-    component: () => import("../views/BudgetingForecastingView.vue"),
-  },
-  {
-    path: "/finance-reports",
-    name: "finance-reports",
-    component: () => import("../views/FinancialReportsView.vue"),
-  },
-  {
-    path: "/finance-security",
-    name: "finance-security",
-    component: () => import("../views/FinanceSecurityAuditView.vue"),
-  },
-  {
-    path: "/team-collaboration",
-    name: "team-collaboration",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-bulletin",
-    name: "team-bulletin",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-channels",
-    name: "team-channels",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-assets",
-    name: "team-assets",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-ticketing",
-    name: "team-ticketing",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-requests",
-    redirect: "/team-ticketing",
-  },
-  {
-    path: "/team-calendar",
-    name: "team-calendar",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-expertise",
-    name: "team-expertise",
-    component: () => import("../views/TeamCollaborationView.vue"),
-  },
-  {
-    path: "/team-directory",
-    redirect: "/team-expertise",
-  },
-  {
-    path: "/auth",
-    name: "auth-role-account",
-    component: () => import("../views/AuthRoleAccountView.vue"),
-  },
-  {
-    path: "/register",
-    name: "register",
-    component: () => import("../views/RegisterView.vue"),
-  },
-  {
-    path: "/account",
-    redirect: "/auth",
-  },
-  {
-    path: "/drive-vault",
-    name: "drive-vault",
-    component: () => import("../views/GoogleDriveVaultView.vue"),
-  },
-  {
-    path: "/drive",
-    redirect: "/drive-vault",
-  },
-  {
-    path: "/google-drive",
-    redirect: "/drive-vault",
   }
 ];
 
@@ -411,29 +294,6 @@ const router = createRouter({
   scrollBehavior() {
     return { top: 0 };
   }
-});
-
-// Navigation Guard: Pastikan halaman diproteksi sampai pengguna berhasil login
-router.beforeEach((to, from, next) => {
-  const authRoutes = ['/login', '/register'];
-  const isAuthPath = authRoutes.includes(to.path);
-  const authed = isAuthenticated();
-
-  // Route root "/" diarahkan ke /home jika sudah login, atau ke /login jika belum
-  if (to.path === '/') {
-    if (authed) {
-      return next('/home');
-    } else {
-      return next('/login');
-    }
-  }
-
-  // Jika belum login dan mencoba mengakses rute dalam aplikasi (seperti /home, /todo, /finance, dll)
-  if (!isAuthPath && !authed) {
-    return next({ path: '/login', query: { redirect: to.fullPath } });
-  }
-
-  next();
 });
 
 router.onError((error) => {

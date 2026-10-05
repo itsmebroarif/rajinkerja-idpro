@@ -30,55 +30,6 @@
         <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-receipt me-1"></i>Jatuh Tempo Invoice</span>
       </div>
 
-      <!-- In-Page Panel Detail Tanggal & Form Agenda (Positioned Above Calendar, Below Legend Bar) -->
-      <div v-if="showDayDetailModal" id="dayDetailPanel" class="card border-0 shadow rounded-4 bg-white p-4 mb-3 animate-scale">
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-          <div>
-            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill mb-1">
-              <i class="bi bi-calendar-event me-1"></i> Detail Agenda Tanggal
-            </span>
-            <h4 class="fw-bold text-dark mb-0" v-if="selectedCell">{{ formatFullDate(selectedCell.dateStr) }}</h4>
-          </div>
-          <button class="btn-close" @click="showDayDetailModal = false" title="Tutup Detail Tanggal"></button>
-        </div>
-
-        <div v-if="selectedCell">
-          <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
-            <span class="fw-bold text-dark small"><i class="bi bi-clock-fill text-primary me-1"></i> {{ getEventsForDate(selectedCell.dateStr).length }} Event Terjadwal</span>
-            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" @click="openAddEventModal(selectedCell.dateStr)">
-              <i class="bi bi-plus-lg me-1"></i> Tambah Agenda
-            </button>
-          </div>
-
-          <!-- List of events -->
-          <div v-if="getEventsForDate(selectedCell.dateStr).length > 0" class="d-flex flex-column gap-2 mb-3">
-            <div v-for="e in getEventsForDate(selectedCell.dateStr)" :key="e.id" class="p-3 bg-white border rounded-3 shadow-sm d-flex justify-content-between align-items-center">
-              <div>
-                <span class="badge bg-primary text-white me-2">{{ e.startTime || 'All Day' }}</span>
-                <strong class="text-dark">{{ e.title }}</strong>
-                <small class="text-muted d-block" v-if="e.notes">{{ e.notes }}</small>
-              </div>
-              <div class="d-flex gap-1">
-                <button class="btn btn-sm btn-outline-primary rounded-circle p-1" @click="editEvent(e)"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger rounded-circle p-1" @click="deleteEvent(e.id)"><i class="bi bi-trash"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tasks & Projects on this day -->
-          <div v-if="getTasksForDate(selectedCell.dateStr).length > 0" class="p-3 bg-warning-subtle text-warning-emphasis rounded-3 border mb-3 small">
-            <strong>📋 Deadline Task:</strong>
-            <ul class="mb-0 ps-3">
-              <li v-for="t in getTasksForDate(selectedCell.dateStr)" :key="t.id">{{ t.name }}</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="d-flex justify-content-end border-top pt-3">
-          <button class="btn btn-secondary rounded-pill px-4" @click="showDayDetailModal = false">Tutup Detail</button>
-        </div>
-      </div>
-
       <!-- Calendar Grid -->
       <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
         <!-- Days Header -->
@@ -134,6 +85,55 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- In-Page Panel Detail Tanggal & Form Agenda (No Modal Overlay) -->
+    <div v-if="showDayDetailModal" id="dayDetailPanel" class="card border-0 shadow rounded-4 bg-white p-4 my-4 animate-scale">
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+        <div>
+          <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+            <i class="bi bi-calendar-event me-1"></i> Detail Agenda Tanggal
+          </span>
+          <h4 class="fw-bold text-dark mb-0" v-if="selectedCell">{{ formatFullDate(selectedCell.dateStr) }}</h4>
+        </div>
+        <button class="btn-close" @click="showDayDetailModal = false" title="Tutup Detail Tanggal"></button>
+      </div>
+
+      <div v-if="selectedCell">
+        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
+          <span class="fw-bold text-dark small"><i class="bi bi-clock-fill text-primary me-1"></i> {{ getEventsForDate(selectedCell.dateStr).length }} Event Terjadwal</span>
+          <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" @click="openAddEventModal(selectedCell.dateStr)">
+            <i class="bi bi-plus-lg me-1"></i> Tambah Agenda
+          </button>
+        </div>
+
+        <!-- List of events -->
+        <div v-if="getEventsForDate(selectedCell.dateStr).length > 0" class="d-flex flex-column gap-2 mb-3">
+          <div v-for="e in getEventsForDate(selectedCell.dateStr)" :key="e.id" class="p-3 bg-white border rounded-3 shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+              <span class="badge bg-primary text-white me-2">{{ e.startTime || 'All Day' }}</span>
+              <strong class="text-dark">{{ e.title }}</strong>
+              <small class="text-muted d-block" v-if="e.notes">{{ e.notes }}</small>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-outline-primary rounded-circle p-1" @click="editEvent(e)"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger rounded-circle p-1" @click="deleteEvent(e.id)"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks & Projects on this day -->
+        <div v-if="getTasksForDate(selectedCell.dateStr).length > 0" class="p-3 bg-warning-subtle text-warning-emphasis rounded-3 border mb-3 small">
+          <strong>📋 Deadline Task:</strong>
+          <ul class="mb-0 ps-3">
+            <li v-for="t in getTasksForDate(selectedCell.dateStr)" :key="t.id">{{ t.name }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end border-top pt-3">
+        <button class="btn btn-secondary rounded-pill px-4" @click="showDayDetailModal = false">Tutup Detail</button>
       </div>
     </div>
 

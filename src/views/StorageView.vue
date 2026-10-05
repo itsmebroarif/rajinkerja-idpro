@@ -24,13 +24,9 @@
           <i class="bi bi-arrow-repeat" :class="{ 'spin-icon': isRefreshing }"></i>
           <span>Segarkan Data</span>
         </button>
-        <button class="btn btn-outline-warning text-dark fw-bold px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2" @click="backupAllToGoogleDrive" :disabled="isBackingUpDrive">
-          <i class="bi bi-cloud-arrow-up-fill text-warning"></i>
-          <span>{{ isBackingUpDrive ? 'Mengunggah ke Drive...' : 'Backup ke Google Drive' }}</span>
-        </button>
         <button class="btn btn-success fw-bold px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2 text-white" @click="exportAllDataBackup">
           <i class="bi bi-download"></i>
-          <span>Backup JSON Lokal</span>
+          <span>Backup JSON Semua Data</span>
         </button>
       </div>
     </div>
@@ -252,91 +248,6 @@
       </div>
     </div>
 
-    <!-- GOOGLE DRIVE CLOUD STORAGE SECTION -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4 border-start border-4 border-warning">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 border-bottom pb-3 mb-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="p-2.5 bg-warning bg-opacity-10 text-warning rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-            <i class="bi bi-google fs-3 text-warning"></i>
-          </div>
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <h5 class="fw-bold text-dark mb-0">☁️ Google Drive Cloud Storage & Sync</h5>
-              <span v-if="googleUser" class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
-                <i class="bi bi-check-circle-fill me-1"></i> Terhubung: {{ googleUser.email }}
-              </span>
-              <span v-else class="badge bg-secondary-subtle text-secondary rounded-pill small">
-                Belum Terhubung
-              </span>
-            </div>
-            <p class="small text-muted mb-0">Cadangkan seluruh basis data TaskArts langsung ke penyimpanan cloud Google Drive akun Anda secara aman.</p>
-          </div>
-        </div>
-
-        <div class="d-flex gap-2">
-          <button v-if="!googleUser" class="btn btn-outline-primary fw-semibold px-3 py-2 rounded-3 d-flex align-items-center gap-2" @click="handleGoogleSignIn" :disabled="isGoogleConnecting">
-            <i class="bi bi-google"></i>
-            <span>{{ isGoogleConnecting ? 'Menghubungkan...' : 'Hubungkan Google Drive' }}</span>
-          </button>
-          <template v-else>
-            <button class="btn btn-warning text-dark fw-bold px-3 py-2 rounded-3 shadow-xs d-flex align-items-center gap-2" @click="backupAllToGoogleDrive" :disabled="isBackingUpDrive">
-              <i class="bi bi-cloud-arrow-up-fill"></i>
-              <span>{{ isBackingUpDrive ? 'Mengunggah...' : 'Backup ke Google Drive' }}</span>
-            </button>
-            <button class="btn btn-outline-secondary fw-semibold px-3 py-2 rounded-3 d-flex align-items-center gap-2" @click="fetchDriveBackups" :disabled="isLoadingDriveFiles">
-              <i class="bi bi-arrow-repeat" :class="{ 'spin-icon': isLoadingDriveFiles }"></i>
-              <span>Cek Berkas di Drive</span>
-            </button>
-            <button class="btn btn-light border text-danger rounded-circle p-2" @click="handleGoogleSignOut" title="Putuskan Google Drive">
-              <i class="bi bi-box-arrow-right"></i>
-            </button>
-          </template>
-        </div>
-      </div>
-
-      <!-- Drive Backups List -->
-      <div v-if="googleUser">
-        <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
-          <i class="bi bi-folder-check text-warning"></i>
-          <span>Berkas Backup TaskArts di Google Drive</span>
-        </h6>
-
-        <div v-if="isLoadingDriveFiles" class="text-center py-4">
-          <div class="spinner-border text-warning spinner-border-sm mb-2" role="status"></div>
-          <p class="small text-muted mb-0">Memuat berkas dari Google Drive API...</p>
-        </div>
-
-        <div v-else-if="driveFiles.length === 0" class="text-center py-4 bg-light rounded-3 border">
-          <i class="bi bi-cloud-slash text-muted fs-2 mb-1 d-block"></i>
-          <p class="small text-muted mb-2">Belum ada berkas backup TaskArts yang ditemukan di Google Drive Anda.</p>
-          <button class="btn btn-sm btn-outline-warning text-dark fw-bold rounded-pill px-3" @click="backupAllToGoogleDrive">
-            + Buat Backup Pertama ke Drive
-          </button>
-        </div>
-
-        <div v-else class="row g-2">
-          <div v-for="file in driveFiles" :key="file.id" class="col-md-6 col-lg-4">
-            <div class="p-3 rounded-3 border bg-light d-flex justify-content-between align-items-center">
-              <div class="min-w-0 me-2">
-                <strong class="text-dark small text-truncate d-block">{{ file.name }}</strong>
-                <span class="small text-muted d-block" style="font-size: 0.78rem;">
-                  {{ file.modifiedTime ? new Date(file.modifiedTime).toLocaleString('id-ID') : '-' }} • {{ file.size ? (parseInt(file.size)/1024).toFixed(1) + ' KB' : 'JSON' }}
-                </span>
-              </div>
-              <div class="d-flex align-items-center gap-1 flex-shrink-0">
-                <a v-if="file.webViewLink" :href="file.webViewLink" target="_blank" class="btn btn-xs btn-outline-primary rounded-circle p-1" title="Buka di Google Drive">
-                  <i class="bi bi-box-arrow-up-right"></i>
-                </a>
-                <button class="btn btn-xs btn-outline-danger rounded-circle p-1" @click="deleteDriveFileHandler(file)" title="Hapus dari Google Drive">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- DETAILED STORAGE BREAKDOWN TABLE -->
     <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -449,12 +360,6 @@
                         <span>Unduh File JSON</span>
                       </button>
                     </li>
-                    <li>
-                      <button class="dropdown-item d-flex align-items-center gap-2" @click="backupSingleKeyToDrive(item)">
-                        <i class="bi bi-cloud-arrow-up text-primary"></i>
-                        <span>Simpan ke Google Drive</span>
-                      </button>
-                    </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                       <button class="dropdown-item text-danger d-flex align-items-center gap-2" @click="deleteSingleKey(item)">
@@ -491,14 +396,6 @@ import {
   clearTemporaryCache,
   executeTotalReset
 } from '../utils/storageManager';
-import {
-  getCurrentGoogleUser,
-  signInWithGoogleWorkspace,
-  signOutGoogleWorkspace,
-  fetchGoogleDriveFiles,
-  uploadJsonToGoogleDrive,
-  deleteGoogleDriveFile
-} from '../utils/googleWorkspaceService';
 
 export default {
   name: 'StorageView',
@@ -733,193 +630,10 @@ export default {
       refreshStorage();
     });
 
-      onUnmounted(() => {
-        window.removeEventListener('storage-quota-updated', handleStorageChange);
-        window.removeEventListener('storage-quota-full', handleStorageChange);
-      });
-
-    // ==========================================================
-    // GOOGLE DRIVE INTEGRATIONS
-    // ==========================================================
-    const googleUser = ref(getCurrentGoogleUser());
-    const isGoogleConnecting = ref(false);
-    const isBackingUpDrive = ref(false);
-    const isLoadingDriveFiles = ref(false);
-    const driveFiles = ref([]);
-
-    const handleGoogleSignIn = async () => {
-      isGoogleConnecting.value = true;
-      try {
-        const res = await signInWithGoogleWorkspace();
-        if (res.success) {
-          googleUser.value = res.user;
-          Swal.fire({
-            icon: 'success',
-            title: 'Google Drive Terhubung',
-            text: `Selamat datang, ${res.user.displayName || res.user.email}! Penyimpanan cloud Google Drive telah siap.`,
-            confirmButtonColor: '#2563eb'
-          });
-          fetchDriveBackups();
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Gagal Menghubungkan Google Drive',
-            text: res.error,
-            confirmButtonColor: '#ef4444'
-          });
-        }
-      } finally {
-        isGoogleConnecting.value = false;
-      }
-    };
-
-    const handleGoogleSignOut = async () => {
-      await signOutGoogleWorkspace();
-      googleUser.value = null;
-      driveFiles.value = [];
-      Swal.fire({
-        icon: 'info',
-        title: 'Google Drive Diputus',
-        text: 'Sesi Google Drive telah diakhiri.',
-        confirmButtonColor: '#2563eb'
-      });
-    };
-
-    const fetchDriveBackups = async () => {
-      if (!googleUser.value) return;
-      isLoadingDriveFiles.value = true;
-      try {
-        // Query for TaskArts backup files on Drive
-        const files = await fetchGoogleDriveFiles("name contains 'TaskArts' and trashed = false", 30);
-        driveFiles.value = files;
-      } catch (err) {
-        console.warn('Gagal memuat berkas Drive:', err);
-      } finally {
-        isLoadingDriveFiles.value = false;
-      }
-    };
-
-    const backupAllToGoogleDrive = async () => {
-      if (!googleUser.value) {
-        await handleGoogleSignIn();
-        if (!googleUser.value) return;
-      }
-
-      isBackingUpDrive.value = true;
-      try {
-        const dateStr = new Date().toISOString().split('T')[0];
-        const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
-        const fileName = `TaskArts_Full_Backup_${dateStr}_${timeStr}.json`;
-
-        // Gather all local storage keys
-        const fullBackup = {
-          app: 'TaskArts',
-          version: '3.0',
-          backupDate: new Date().toISOString(),
-          keys: {}
-        };
-
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k) {
-            try {
-              fullBackup.keys[k] = JSON.parse(localStorage.getItem(k));
-            } catch (e) {
-              fullBackup.keys[k] = localStorage.getItem(k);
-            }
-          }
-        }
-
-        const res = await uploadJsonToGoogleDrive(fileName, fullBackup, 'Full Data Snapshot of TaskArts System');
-        if (res.id) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Berhasil Dicadangkan!',
-            html: `Seluruh data aplikasi tersimpan di Google Drive dengan nama berkas <strong>${fileName}</strong>.`,
-            confirmButtonColor: '#2563eb'
-          });
-          fetchDriveBackups();
-        }
-      } catch (err) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Mencadangkan ke Google Drive',
-          text: err.message,
-          confirmButtonColor: '#ef4444'
-        });
-      } finally {
-        isBackingUpDrive.value = false;
-      }
-    };
-
-    const backupSingleKeyToDrive = async (item) => {
-      if (!googleUser.value) {
-        await handleGoogleSignIn();
-        if (!googleUser.value) return;
-      }
-
-      try {
-        const dateStr = new Date().toISOString().split('T')[0];
-        const fileName = `TaskArts_Module_${item.key}_${dateStr}.json`;
-        const raw = localStorage.getItem(item.key) || '{}';
-        let parsed;
-        try {
-          parsed = JSON.parse(raw);
-        } catch {
-          parsed = raw;
-        }
-
-        const payload = {
-          app: 'TaskArts',
-          moduleKey: item.key,
-          label: item.label,
-          category: item.category,
-          date: new Date().toISOString(),
-          data: parsed
-        };
-
-        const res = await uploadJsonToGoogleDrive(fileName, payload, `Backup module ${item.label}`);
-        if (res.id) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Tersimpan ke Google Drive!',
-            html: `Modul <strong>${item.label}</strong> berhasil diunggah ke Google Drive sebagai <strong>${fileName}</strong>.`,
-            confirmButtonColor: '#2563eb'
-          });
-          fetchDriveBackups();
-        }
-      } catch (err) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Mengunggah',
-          text: err.message,
-          confirmButtonColor: '#ef4444'
-        });
-      }
-    };
-
-    const deleteDriveFileHandler = async (file) => {
-      try {
-        const res = await deleteGoogleDriveFile(file.id, file.name);
-        if (res.success) {
-          driveFiles.value = driveFiles.value.filter(f => f.id !== file.id);
-          Swal.fire({
-            icon: 'success',
-            title: 'Berkas Dihapus',
-            text: `Berkas "${file.name}" telah dihapus dari Google Drive.`,
-            timer: 2000,
-            showConfirmButton: false
-          });
-        }
-      } catch (err) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Menghapus',
-          text: err.message,
-          confirmButtonColor: '#ef4444'
-        });
-      }
-    };
+    onUnmounted(() => {
+      window.removeEventListener('storage-quota-updated', handleStorageChange);
+      window.removeEventListener('storage-quota-full', handleStorageChange);
+    });
 
     return {
       storageInfo,
@@ -936,20 +650,7 @@ export default {
       deleteSingleKey,
       confirmTotalReset,
       loadSampleDataForDemo,
-      exportAllDataBackup,
-
-      // Google Drive integration
-      googleUser,
-      isGoogleConnecting,
-      isBackingUpDrive,
-      isLoadingDriveFiles,
-      driveFiles,
-      handleGoogleSignIn,
-      handleGoogleSignOut,
-      fetchDriveBackups,
-      backupAllToGoogleDrive,
-      backupSingleKeyToDrive,
-      deleteDriveFileHandler
+      exportAllDataBackup
     };
   }
 };

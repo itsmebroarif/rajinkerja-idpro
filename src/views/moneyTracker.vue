@@ -146,7 +146,7 @@
                 class="form-control"
                 :class="{ 'is-invalid': formErrors.amount }"
                 v-model.number="form.amount"
-                placeholder="Contoh: 1000000"
+                placeholder="1000000"
               />
               <div class="invalid-feedback" v-if="formErrors.amount">{{ formErrors.amount }}</div>
             </div>

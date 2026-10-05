@@ -39,7 +39,7 @@
     </div>
 
     <!-- 3D Canvas Area -->
-    <div ref="canvasContainer" class="w-100 position-relative" style="height: clamp(340px, 58vh, 520px); cursor: crosshair;"></div>
+    <div ref="canvasContainer" class="w-100 position-relative" style="height: 520px; cursor: crosshair;"></div>
 
     <!-- Crosshair in center during play -->
     <div v-if="isPlaying && !isGameOver && !isPaused" class="position-absolute top-50 start-50 translate-middle pointer-events-none z-2 text-warning opacity-75">
@@ -353,7 +353,7 @@ export default {
       if (!canvasContainer.value) return;
 
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 480;
+      const height = 520;
 
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x111827);
@@ -363,7 +363,6 @@ export default {
       camera.position.set(0, 12, 18);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -443,7 +442,7 @@ export default {
     const handleResize = () => {
       if (!canvasContainer.value || !renderer || !camera) return;
       const width = canvasContainer.value.clientWidth;
-      const height = canvasContainer.value.clientHeight || 480;
+      const height = 520;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
